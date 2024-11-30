@@ -4,30 +4,59 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Loader2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
-const apiResponse = {
-  text: "Artificial intelligence (AI) is intelligence demonstrated by machines, as opposed to natural intelligence displayed by animals including humans. AI research has been defined as the field of study of intelligent agents, which refers to any system that perceives its environment and takes actions that maximize its chance of achieving its goals.",
-  sources: [
-    "https://en.wikipedia.org/wiki/Artificial_intelligence",
-    "https://www.ibm.com/cloud/learn/what-is-artificial-intelligence",
-    "https://www.britannica.com/technology/artificial-intelligence",
-  ],
-};
+interface ApiResponse {
+  response: string;
+  sources: Array<{
+    score: number;
+    url: string;
+  }>;
+}
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [showData, setShowData] = useState(false);
+  const [apiResponse, setApiResponse] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!searchQuery.trim()) {
+      setError("Please enter a search query");
+      return;
+    }
+
     setIsLoading(true);
+    setError(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/chat`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message: searchQuery }),
+        }
+      );
 
-    setShowData(true);
-    setIsLoading(false);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data: ApiResponse = await response.json();
+      setApiResponse(data);
+    } catch (err) {
+      setError("Failed to fetch search results. Please try again.");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -42,16 +71,47 @@ export default function SearchPage() {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="flex-grow"
         />
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Loading..." : "Send"}
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="flex items-center gap-2"
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Loading...
+            </>
+          ) : (
+            "Send"
+          )}
         </Button>
       </form>
 
-      {showData && (
+      {error && (
+        <div
+          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4"
+          role="alert"
+        >
+          {error}
+        </div>
+      )}
+
+      {apiResponse && (
         <Card className="mt-6">
-          <CardContent className="space-y-4">
-            <div>
-              <p className="text-gray-700 p-3 mt-2">{apiResponse.text}</p>
+          <CardContent className="space-y-4 p-6">
+            <div className="prose">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  a: (props) => (
+                    <a href={props.href} target="_blank" rel="noreferrer">
+                      {props.children}
+                    </a>
+                  ),
+                }}
+              >
+                {apiResponse.response}
+              </ReactMarkdown>
             </div>
             <div>
               <h2 className="text-lg font-semibold mb-2">Sources</h2>
@@ -59,12 +119,12 @@ export default function SearchPage() {
                 {apiResponse.sources.map((source, index) => (
                   <li key={index}>
                     <a
-                      href={source}
+                      href={source.url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline flex items-center"
                     >
-                      {new URL(source).hostname}
+                      {new URL(source.url).hostname}
                       <ExternalLink className="ml-1 h-4 w-4 inline" />
                     </a>
                   </li>

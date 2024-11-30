@@ -1,0 +1,6 @@
+POST https://promenade-ai-backend.onrender.com/api/chat
+Content-Type: application/json
+
+{
+    "message": "apple updates"
+}
