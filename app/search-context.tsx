@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useState, useEffect } from 'react'
+import React, { createContext, useState, useEffect } from "react";
 
 interface SearchResult {
   query: string;
@@ -22,64 +22,73 @@ interface SearchContextType {
 
 export const SearchContext = createContext<SearchContextType>({
   searches: [],
-  currentQuery: '',
+  currentQuery: "",
   searchResults: [],
   setCurrentQuery: () => {},
   addSearch: () => {},
   getSearchResult: () => undefined,
-})
+});
 
-export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [searches, setSearches] = useState<string[]>([])
-  const [currentQuery, setCurrentQuery] = useState("")
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [searches, setSearches] = useState<string[]>([]);
+  const [currentQuery, setCurrentQuery] = useState<string>("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
   useEffect(() => {
-    const storedSearches = localStorage.getItem("searches")
-    const storedResults = localStorage.getItem("searchResults")
+    const storedSearches = localStorage.getItem("searches");
+    const storedResults = localStorage.getItem("searchResults");
     if (storedSearches) {
       try {
-        setSearches(JSON.parse(storedSearches))
+        setSearches(JSON.parse(storedSearches));
       } catch (error) {
-        console.error("Error parsing stored searches:", error)
-        setSearches([])
+        console.error("Error parsing stored searches:", error);
+        setSearches([]);
       }
     }
     if (storedResults) {
       try {
-        setSearchResults(JSON.parse(storedResults))
+        setSearchResults(JSON.parse(storedResults));
       } catch (error) {
-        console.error("Error parsing stored results:", error)
-        setSearchResults([])
+        console.error("Error parsing stored results:", error);
+        setSearchResults([]);
       }
     }
-  }, [])
+  }, []);
 
   const addSearch = (query: string, result: SearchResult) => {
-    const updatedSearches = [query, ...searches.filter(s => s !== query)].slice(0, 20)
-    setSearches(updatedSearches)
-    localStorage.setItem("searches", JSON.stringify(updatedSearches))
+    const updatedSearches = [
+      query,
+      ...searches.filter((s) => s !== query),
+    ].slice(0, 20);
+    setSearches(updatedSearches);
+    localStorage.setItem("searches", JSON.stringify(updatedSearches));
 
-    const updatedResults = [result, ...searchResults.filter(r => r.query !== query)].slice(0, 20)
-    setSearchResults(updatedResults)
-    localStorage.setItem("searchResults", JSON.stringify(updatedResults))
-  }
+    const updatedResults = [
+      result,
+      ...searchResults.filter((r) => r.query !== query),
+    ].slice(0, 20);
+    setSearchResults(updatedResults);
+    localStorage.setItem("searchResults", JSON.stringify(updatedResults));
+  };
 
   const getSearchResult = (query: string) => {
-    return searchResults.find(result => result.query === query);
-  }
+    return searchResults.find((result) => result.query === query);
+  };
 
   return (
-    <SearchContext.Provider value={{ 
-      searches, 
-      currentQuery, 
-      searchResults,
-      setCurrentQuery, 
-      addSearch,
-      getSearchResult
-    }}>
+    <SearchContext.Provider
+      value={{
+        searches,
+        currentQuery,
+        searchResults,
+        setCurrentQuery,
+        addSearch,
+        getSearchResult,
+      }}
+    >
       {children}
     </SearchContext.Provider>
-  )
-}
-
+  );
+};

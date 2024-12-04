@@ -4,11 +4,12 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { SearchIcon, Loader2 } from 'lucide-react'
 import { cn } from "@/lib/utils"
+import { SearchResult } from "@/types/search"
 
 interface SearchPageProps {
   currentQuery: string
   setCurrentQuery: (query: string) => void
-  addSearch: (query: string) => void
+  addSearch: (query: string, result: SearchResult) => void
 }
 
 export default function SearchPage({ currentQuery, setCurrentQuery, addSearch }: SearchPageProps) {
@@ -49,7 +50,7 @@ export default function SearchPage({ currentQuery, setCurrentQuery, addSearch }:
 
       const data = await response.json()
       localStorage.setItem("searchResults", JSON.stringify(data))
-      addSearch(currentQuery)
+      addSearch(currentQuery, { query: currentQuery, ...data });
       router.push("/search")
     } catch (err) {
       setError("Failed to fetch search results. Please try again.")

@@ -103,26 +103,49 @@ export default function SearchResultsPage() {
 
   return (
     <div className="container mx-auto p-8">
-      <form
-        onSubmit={handleSearch}
-        className="relative w-full max-w-3xl mx-auto mb-8"
-      >
-        <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-        <input
-          type="text"
-          value={currentQuery}
-          onChange={(e) => setCurrentQuery(e.target.value)}
-          className="w-full pl-10 pr-20 py-3 rounded-full bg-gray-50 border border-gray-200 text-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-          placeholder="Enter your search query"
-        />
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-50"
+      <div className="mb-8">
+        <form
+          onSubmit={handleSearch}
+          className="flex items-center justify-center gap-4 mt-8"
         >
-          {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : "Search"}
-        </button>
-      </form>
+          <div className="relative w-3/4 max-w-2xl">
+            <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="What are the key financial highlights of Tesla Inc. for Q3 2024?"
+              value={currentQuery}
+              onChange={(e) => setCurrentQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-full focus:outline-none text-gray-700 placeholder-gray-500"
+              style={{
+                border: "1.5px solid transparent",
+                borderRadius: "9999px",
+                backgroundImage:
+                  "linear-gradient(white, white), linear-gradient(299.73deg, #B689FF 18.18%, #00EC9D 100.4%, #B588FE 210.75%, #D3FF95 297.18%)",
+                backgroundOrigin: "border-box",
+                backgroundClip: "padding-box, border-box",
+              }}
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="rounded-full px-6 py-3 font-medium text-white transition-opacity disabled:opacity-50"
+            style={{
+              background:
+                "linear-gradient(285.8deg, #B689FF 11.03%, #00EC9D 50%, #D3FF95 88.97%)",
+            }}
+          >
+            {isLoading ? (
+              <div className="flex items-center">
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <span>Loading...</span>
+              </div>
+            ) : (
+              "Search"
+            )}
+          </button>
+        </form>
+      </div>
 
       {error && (
         <div className="w-full max-w-3xl mx-auto mb-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
