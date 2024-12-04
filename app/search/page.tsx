@@ -136,7 +136,7 @@ export default function SearchResultsPage() {
 
       {searchResults && (
         <>
-          <div className="mb-8 prose">
+          <div className="mb-8 prose mx-auto">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {searchResults.response}
             </ReactMarkdown>
