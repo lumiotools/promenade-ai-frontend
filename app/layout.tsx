@@ -2,6 +2,7 @@ import localFont from "next/font/local";
 import { SearchProvider } from "./search-context";
 import "./globals.css";
 import { AppSidebar } from "@/components/Sidebar";
+import { Metadata } from "next";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -15,6 +16,11 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
+export const metadata: Metadata = {
+  title: "promenade.ai",
+  description: "promenade ai",
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -26,9 +32,9 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased h-full`}
       >
         <SearchProvider>
-          <div className="flex min-h-screen">
+          <div className="flex flex-col md:flex-row min-h-screen">
             <AppSidebar />
-            <main className="flex-1 bg-white h-full">{children}</main>
+            <main className="flex-1 bg-white h-full w-full">{children}</main>
           </div>
         </SearchProvider>
       </body>

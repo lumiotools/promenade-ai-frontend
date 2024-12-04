@@ -1,15 +1,6 @@
-"use client"
-
+"use client";
+import { SearchResult } from "@/types/search";
 import React, { createContext, useState, useEffect } from "react";
-
-interface SearchResult {
-  query: string;
-  response: string;
-  sources: Array<{
-    score: number;
-    url: string;
-  }>;
-}
 
 interface SearchContextType {
   searches: string[];
@@ -37,24 +28,18 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
   useEffect(() => {
-    const storedSearches = localStorage.getItem("searches");
-    const storedResults = localStorage.getItem("searchResults");
-    if (storedSearches) {
+    const parseLocalStorage = <T,>(key: string, defaultValue: T[]): T[] => {
       try {
-        setSearches(JSON.parse(storedSearches));
+        const stored = localStorage.getItem(key);
+        return stored ? JSON.parse(stored) : defaultValue;
       } catch (error) {
-        console.error("Error parsing stored searches:", error);
-        setSearches([]);
+        console.error(`Error parsing ${key}:`, error);
+        return defaultValue;
       }
-    }
-    if (storedResults) {
-      try {
-        setSearchResults(JSON.parse(storedResults));
-      } catch (error) {
-        console.error("Error parsing stored results:", error);
-        setSearchResults([]);
-      }
-    }
+    };
+
+    setSearches(parseLocalStorage("searches", []));
+    setSearchResults(parseLocalStorage("searchResults", []));
   }, []);
 
   const addSearch = (query: string, result: SearchResult) => {
@@ -62,6 +47,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
       query,
       ...searches.filter((s) => s !== query),
     ].slice(0, 20);
+
     setSearches(updatedSearches);
     localStorage.setItem("searches", JSON.stringify(updatedSearches));
 
@@ -69,12 +55,15 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
       result,
       ...searchResults.filter((r) => r.query !== query),
     ].slice(0, 20);
+
     setSearchResults(updatedResults);
     localStorage.setItem("searchResults", JSON.stringify(updatedResults));
   };
 
   const getSearchResult = (query: string) => {
-    return searchResults.find((result) => result.query === query);
+    return Array.isArray(searchResults) 
+      ? searchResults.find((result) => result.query === query)
+      : undefined;
   };
 
   return (

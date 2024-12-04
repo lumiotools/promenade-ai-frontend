@@ -102,13 +102,13 @@ export default function SearchResultsPage() {
   };
 
   return (
-    <div className="container mx-auto p-8">
+    <div className="container mx-auto p-4 md:p-8 mt-3 md:mt-0">
       <div className="mb-8">
         <form
           onSubmit={handleSearch}
-          className="flex items-center justify-center gap-4 mt-8"
+          className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8"
         >
-          <div className="relative w-3/4 max-w-2xl">
+          <div className="relative w-full md:w-3/4 max-w-2xl">
             <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
@@ -129,14 +129,14 @@ export default function SearchResultsPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="rounded-full px-6 py-3 font-medium text-white transition-opacity disabled:opacity-50"
+            className="w-full md:w-auto rounded-full px-6 py-3 font-medium text-white transition-opacity disabled:opacity-50"
             style={{
               background:
                 "linear-gradient(285.8deg, #B689FF 11.03%, #00EC9D 50%, #D3FF95 88.97%)",
             }}
           >
             {isLoading ? (
-              <div className="flex items-center">
+              <div className="flex items-center justify-center">
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 <span>Loading...</span>
               </div>
