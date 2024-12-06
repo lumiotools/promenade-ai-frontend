@@ -164,7 +164,7 @@ export default function SearchResultsPage() {
           {searchResults.response.map((content, index) => (
             <div className="bg-white  p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]" key={index}>
               <div className="">
-                <div className="line-clamp-6 overflow-hidden">
+                <div className="line-clamp-6 overflow-hidden prose">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     className="text-gray-800"
