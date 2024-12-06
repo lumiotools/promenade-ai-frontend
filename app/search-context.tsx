@@ -43,21 +43,22 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const addSearch = (query: string, result: SearchResult) => {
-    const updatedSearches = [
-      query,
-      ...searches.filter((s) => s !== query),
-    ].slice(0, 20);
+    console.log(query, result);
+    // const updatedSearches = [
+    //   query,
+    //   ...searches.filter((s) => s !== query),
+    // ].slice(0, 20);
 
-    setSearches(updatedSearches);
-    localStorage.setItem("searches", JSON.stringify(updatedSearches));
+    // setSearches(updatedSearches);
+    // localStorage.setItem("searches", JSON.stringify(updatedSearches));
+    // console.log("")
+    // const updatedResults = [
+    //   result,
+    //   ...searchResults.filter((r) => r.query !== query),
+    // ].slice(0, 20);
 
-    const updatedResults = [
-      result,
-      ...searchResults.filter((r) => r.query !== query),
-    ].slice(0, 20);
-
-    setSearchResults(updatedResults);
-    localStorage.setItem("searchResults", JSON.stringify(updatedResults));
+    // setSearchResults(updatedResults);
+    // localStorage.setItem("searchResults", JSON.stringify(updatedResults));
   };
 
   const getSearchResult = (query: string) => {

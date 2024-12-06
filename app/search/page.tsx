@@ -1,15 +1,19 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { Search, ExternalLink, Loader2 } from "lucide-react";
+import { Search, ExternalLink, Loader2, Globe } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
 import { SearchContext } from "@/app/search-context";
+interface Node{
+  content:string;
+  source:string;
+}
 
 interface ApiResponse {
-  response: string;
+  response: [Node];
   sources: Array<{
     score: number;
     url: string;
@@ -28,10 +32,11 @@ export default function SearchResultsPage() {
 
   useEffect(() => {
     const loadSearchResults = () => {
-      const storedResult = localStorage.getItem("currentSearchResult");
+      const storedResult = localStorage.getItem("searchResults");
       if (storedResult) {
         try {
-          const parsedResult = JSON.parse(storedResult);
+          const parsedResult: ApiResponse = JSON.parse(storedResult);
+          console.log("data", parsedResult)
           setSearchResults(parsedResult);
         } catch (error) {
           console.error("Error parsing stored search result:", error);
@@ -90,7 +95,7 @@ export default function SearchResultsPage() {
       }
 
       setSearchResults(data);
-      addSearch(currentQuery, { query: currentQuery, ...data });
+      addSearch(currentQuery, {query:currentQuery,...data});
       localStorage.setItem("currentSearchResult", JSON.stringify(data));
     } catch (err) {
       console.error("Search error:", err);
@@ -155,13 +160,32 @@ export default function SearchResultsPage() {
 
       {searchResults ? (
         <>
-          <div className="mb-8 prose max-w-none">
+        <div className="grid  grid-cols-2 gap-4">
+          {searchResults.response.map((content, index) => (
+            <div className="bg-white  p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]" key={index}>
+              <div className="">
+                <div className="line-clamp-6 overflow-hidden">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    className="text-gray-800"
+                  >
+                    {content.content}
+                  </ReactMarkdown>
+                </div>
+              </div>
+              <div className="mt-3 text-blue-500 ">
+              <p className="flex gap-x-1 line-clamp-1 items-center"><Globe className="w-5 h-5"/> <a href={content.source}> {new URL(content.source).hostname.replace('www.', '')}</a></p>
+              </div>
+            </div>
+          ))}
+        </div>
+          {/* <div className="mb-8 prose max-w-none">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {searchResults.response}
             </ReactMarkdown>
-          </div>
+          </div> */}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 mt-8 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <button
               className={cn(
                 "p-4 text-purple-500 border-2 border-purple-200 rounded-2xl transition-colors",

@@ -49,10 +49,12 @@ export default function SearchPage({
       );
 
       if (!response.ok) {
+        console.log("network error")
         throw new Error("Network response was not ok");
       }
 
       const data = await response.json();
+      console.log("data: " + data);
       localStorage.setItem("searchResults", JSON.stringify(data));
       addSearch(currentQuery, { query: currentQuery, ...data });
       router.push("/search");
