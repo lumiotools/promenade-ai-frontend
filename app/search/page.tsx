@@ -162,7 +162,7 @@ export default function SearchResultsPage() {
         <>
         <div className="container mx-auto flex flex-col gap-4">
           {searchResults.response.length>0 && searchResults.response.map((content, index) => (
-            <div className="bg-white mx-auto p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]" key={index}>
+            <div className="bg-white max-w-screen-md mx-auto w-full p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]" key={index}>
               <div className="">
                 <div className=" overflow-hidden prose">
                   <ReactMarkdown
