@@ -161,13 +161,20 @@ export default function SearchResultsPage() {
       {searchResults ? (
         <>
         <div className="grid  grid-cols-2 gap-4">
-          {searchResults.response.map((content, index) => (
+          {searchResults.response.length>0 && searchResults.response.map((content, index) => (
             <div className="bg-white  p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]" key={index}>
               <div className="">
                 <div className="line-clamp-6 overflow-hidden prose">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     className="text-gray-800"
+                    components={{
+                      a: (props) => (
+                        <a href={props.href} target="_blank" rel="noreferrer">
+                          {props.children}
+                        </a>
+                      ),
+                    }}
                   >
                     {content.content}
                   </ReactMarkdown>
@@ -178,6 +185,11 @@ export default function SearchResultsPage() {
               </div>
             </div>
           ))}
+          {
+            searchResults.response.length < 1 && (
+              <h1>No results found.</h1>
+            )
+          }
         </div>
           {/* <div className="mb-8 prose max-w-none">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
