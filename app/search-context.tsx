@@ -27,17 +27,19 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
   const [currentQuery, setCurrentQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
 
-  useEffect(() => {
-    const parseLocalStorage = <T,>(key: string, defaultValue: T[]): T[] => {
-      try {
-        const stored = localStorage.getItem(key);
-        return stored ? JSON.parse(stored) : defaultValue;
-      } catch (error) {
-        console.error(`Error parsing ${key}:`, error);
-        return defaultValue;
-      }
-    };
+  const parseLocalStorage = <T,>(key: string, defaultValue: T[]): T[] => {
+    try {
+      const stored = localStorage.getItem(key);
+      const parsed = stored ? JSON.parse(stored) : defaultValue;
 
+      return Array.isArray(parsed) ? parsed : defaultValue;
+    } catch (error) {
+      console.error(`Error parsing ${key}:`, error);
+      return defaultValue;
+    }
+  };
+
+  useEffect(() => {
     setSearches(parseLocalStorage("searches", []));
     setSearchResults(parseLocalStorage("searchResults", []));
   }, []);
@@ -61,9 +63,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const getSearchResult = (query: string) => {
-    return Array.isArray(searchResults) 
-      ? searchResults.find((result) => result.query === query)
-      : undefined;
+    return searchResults.find((result) => result.query === query);
   };
 
   return (
