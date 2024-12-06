@@ -162,7 +162,7 @@ export default function SearchResultsPage() {
         <>
         <div className="grid  grid-cols-2 gap-4">
           {searchResults.response.length>0 && searchResults.response.map((content, index) => (
-            <div className="bg-white  p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]" key={index}>
+            <div className="bg-white p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]" key={index}>
               <div className="">
                 <div className="line-clamp-6 overflow-hidden prose">
                   <ReactMarkdown
@@ -181,7 +181,7 @@ export default function SearchResultsPage() {
                 </div>
               </div>
               <div className="mt-3 text-blue-500 ">
-              <p className="flex gap-x-1 line-clamp-1 items-center"><Globe className="w-5 h-5"/> <a href={content.source}> {new URL(content.source).hostname.replace('www.', '')}</a></p>
+              <p className="flex gap-x-1 line-clamp-1 items-center"><Globe className="w-5 h-5"/> <a href={content.source} target="_blank"> {new URL(content.source).hostname.replace('www.', '')}</a></p>
               </div>
             </div>
           ))}
