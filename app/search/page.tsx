@@ -160,11 +160,11 @@ export default function SearchResultsPage() {
 
       {searchResults ? (
         <>
-        <div className="grid  grid-cols-2 gap-4">
+        <div className="container mx-auto flex flex-col gap-4">
           {searchResults.response.length>0 && searchResults.response.map((content, index) => (
-            <div className="bg-white p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]" key={index}>
+            <div className="bg-white mx-auto p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]" key={index}>
               <div className="">
-                <div className="line-clamp-6 overflow-hidden prose">
+                <div className=" overflow-hidden prose">
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     className="text-gray-800"
