@@ -3,16 +3,13 @@
 import * as React from "react";
 import { useContext } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, Menu } from "lucide-react";
-import {
-  SearchContext,
-  SearchResult,
-} from "@/app/search-context";
+import { Menu, Trash2 } from "lucide-react";
+import { SearchContext, SearchResult } from "@/app/search-context";
 import Image from "next/image";
 import logo from "../public/images/logo pro.png";
 
 export function AppSidebar() {
-  const { searches, setCurrentQuery, setCurrentResult } =
+  const { searches, setCurrentQuery, setCurrentResult, deleteSearch } =
     useContext(SearchContext);
   const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
@@ -70,7 +67,17 @@ export function AppSidebar() {
                 className="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
               >
                 <span className="truncate">{search.query}</span>
-                <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                <div className="flex items-center">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteSearch(search.query);
+                    }}
+                    className="text-gray-400 hover:text-red-500 transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </button>
             </div>
           ))}

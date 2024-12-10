@@ -1,4 +1,5 @@
 "use client";
+
 import React, { createContext, useState, useEffect } from "react";
 
 interface Node {
@@ -34,6 +35,7 @@ export interface SearchContextType {
   addSearch: (query: string, result: ApiResponse) => void;
   getSearchResult: (query: string) => ApiResponse | null;
   setCurrentResult: (result: ApiResponse | null) => void;
+  deleteSearch: (query: string) => void;
 }
 
 export const SearchContext = createContext<SearchContextType>({
@@ -44,6 +46,7 @@ export const SearchContext = createContext<SearchContextType>({
   addSearch: () => {},
   getSearchResult: () => null,
   setCurrentResult: () => {},
+  deleteSearch: () => {},
 });
 
 export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -77,6 +80,17 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
     return search ? search.result : null;
   };
 
+  const deleteSearch = (query: string) => {
+    const updatedSearches = searches.filter((s) => s.query !== query);
+    setSearches(updatedSearches);
+    localStorage.setItem("searches", JSON.stringify(updatedSearches));
+
+    if (currentQuery === query) {
+      setCurrentQuery("");
+      setCurrentResult(null);
+    }
+  };
+
   return (
     <SearchContext.Provider
       value={{
@@ -87,6 +101,7 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
         addSearch,
         getSearchResult,
         setCurrentResult,
+        deleteSearch,
       }}
     >
       {children}
