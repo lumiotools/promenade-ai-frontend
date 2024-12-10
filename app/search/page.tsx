@@ -7,9 +7,11 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "@/lib/utils";
 import { SearchContext } from "@/app/search-context";
-interface Node{
-  content:string;
-  source:string;
+import { CardHeader, CardTitle } from "../ui/card";
+
+interface Node {
+  content: string;
+  source: string;
 }
 
 interface ApiResponse {
@@ -18,6 +20,8 @@ interface ApiResponse {
     score: number;
     url: string;
   }>;
+  valid_sources: string[];
+  invalid_sources: string[];
 }
 
 type TabType = "earnings" | "financials" | "industry" | "market";
@@ -36,7 +40,7 @@ export default function SearchResultsPage() {
       if (storedResult) {
         try {
           const parsedResult: ApiResponse = JSON.parse(storedResult);
-          console.log("data", parsedResult)
+          console.log("data", parsedResult);
           setSearchResults(parsedResult);
         } catch (error) {
           console.error("Error parsing stored search result:", error);
@@ -95,7 +99,7 @@ export default function SearchResultsPage() {
       }
 
       setSearchResults(data);
-      addSearch(currentQuery, {query:currentQuery,...data});
+      addSearch(currentQuery, { query: currentQuery, ...data });
       localStorage.setItem("currentSearchResult", JSON.stringify(data));
     } catch (err) {
       console.error("Search error:", err);
@@ -160,37 +164,101 @@ export default function SearchResultsPage() {
 
       {searchResults ? (
         <>
-        <div className="container mx-auto flex flex-col gap-4">
-          {searchResults.response.length>0 && searchResults.response.map((content, index) => (
-            <div className="bg-white max-w-screen-md mx-auto w-full p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]" key={index}>
-              <div className="">
-                <div className=" overflow-hidden prose">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    className="text-gray-800"
-                    components={{
-                      a: (props) => (
-                        <a href={props.href} target="_blank" rel="noreferrer">
-                          {props.children}
-                        </a>
-                      ),
-                    }}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="lg:col-span-2 space-y-6">
+              {searchResults.response.length > 0 &&
+                searchResults.response.map((content, index) => (
+                  <div
+                    className="bg-white max-w-screen-md mx-auto w-full p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]"
+                    key={index}
                   >
-                    {content.content}
-                  </ReactMarkdown>
-                </div>
-              </div>
-              <div className="mt-3 text-blue-500 ">
-              <p className="flex gap-x-1 line-clamp-1 items-center"><Globe className="w-5 h-5"/> <a href={content.source} target="_blank"> {new URL(content.source).hostname.replace('www.', '')}</a></p>
-              </div>
+                    <div className="">
+                      <div className=" overflow-hidden prose">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          className="text-gray-800"
+                          components={{
+                            a: (props) => (
+                              <a
+                                href={props.href}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {props.children}
+                              </a>
+                            ),
+                          }}
+                        >
+                          {content.content}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                    <div className="mt-3 text-blue-500 ">
+                      <p className="flex gap-x-1 line-clamp-1 items-center">
+                        <Globe className="w-5 h-5" />{" "}
+                        <a href={content.source} target="_blank">
+                          {" "}
+                          {new URL(content.source).hostname.replace("www.", "")}
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              {searchResults.response.length < 1 && <h1>No results found.</h1>}
             </div>
-          ))}
-          {
-            searchResults.response.length < 1 && (
-              <h1>No results found.</h1>
-            )
-          }
-        </div>
+
+            <div className="space-y-6">
+              <Card className="border-[rgb(34,193,195)]">
+                <CardHeader>
+                  <CardTitle>Found Answers From</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {searchResults.valid_sources.map((source, index) => (
+                      <li key={index}>
+                        <a
+                          href={source}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                        >
+                          <Globe className="w-4 h-4" />
+                          <span className="truncate">
+                            {new URL(source).hostname.replace("www.", "")}
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+
+              <Card className="border-[rgb(34,193,195)]">
+                <CardHeader>
+                  <CardTitle>No Answer Found From</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {searchResults.invalid_sources.map((source, index) => (
+                      <li key={index}>
+                        <a
+                          href={source}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                        >
+                          <Globe className="w-4 h-4" />
+                          <span className="truncate">
+                            {new URL(source).hostname.replace("www.", "")}
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
           {/* <div className="mb-8 prose max-w-none">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {searchResults.response}
