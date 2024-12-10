@@ -39,9 +39,9 @@ export function AppSidebar() {
         <Menu size={24} />
       </button>
       <div
-        className={`fixed inset-y-0 left-0 transform ${
+        className={`fixed inset-y-0 left-0 w-64 bg-[#0A0A0A] text-white flex flex-col z-40 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0 transition duration-200 ease-in-out md:w-64 bg-[#0A0A0A] text-white flex flex-col min-h-screen z-40`}
+        } md:translate-x-0 transition duration-200 ease-in-out`}
       >
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center gap-2 mb-4">
@@ -61,7 +61,7 @@ export function AppSidebar() {
             <span>+ New</span>
           </button>
         </div>
-        <nav className="flex-1 overflow-y-auto">
+        <nav className="flex-1 overflow-y-auto h-full">
           {searches.map((query, index) => (
             <div key={index} className="px-2 py-1">
               <button

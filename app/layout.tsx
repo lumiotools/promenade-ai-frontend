@@ -29,12 +29,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased h-full`}
+        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased h-full overflow-hidden`}
       >
         <SearchProvider>
-          <div className="flex flex-col md:flex-row min-h-screen">
+          <div className="flex h-full">
             <AppSidebar />
-            <main className="flex-1 bg-white h-full w-full">{children}</main>
+            <main className="flex-1 overflow-auto ml-0 md:ml-64 bg-white h-full">
+              {children}
+            </main>
           </div>
         </SearchProvider>
       </body>

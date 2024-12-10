@@ -49,12 +49,10 @@ export default function SearchPage({
       );
 
       if (!response.ok) {
-        console.log("network error")
         throw new Error("Network response was not ok");
       }
 
       const data = await response.json();
-      console.log("data: " + data);
       localStorage.setItem("searchResults", JSON.stringify(data));
       addSearch(currentQuery, { query: currentQuery, ...data });
       router.push("/search");
@@ -67,7 +65,7 @@ export default function SearchPage({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <div className="flex items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-3xl text-center mb-8">
         <h1 className="text-3xl md:text-4xl font-bold mb-2 flex flex-col md:flex-row items-center justify-center gap-2">
           <span
@@ -150,13 +148,13 @@ export default function SearchPage({
             All sources including web
           </button>
         </div>
-      </div>
 
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-full relative mb-4 w-full max-w-3xl">
-          {error}
-        </div>
-      )}
+        {error && (
+          <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-full relative w-full max-w-3xl mx-auto">
+            {error}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
