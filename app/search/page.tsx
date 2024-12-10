@@ -1,23 +1,32 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { Search, ExternalLink, Loader2, Globe } from "lucide-react";
+import { Search, Loader2, Globe, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { cn } from "@/lib/utils";
 import { SearchContext } from "@/app/search-context";
-interface Node{
-  content:string;
-  source:string;
+import { CardHeader, CardTitle } from "../ui/card";
+import { cn } from "@/lib/utils";
+
+interface Node {
+  content: string;
+  source: string;
+}
+
+interface Source {
+  doc_type: string;
+  url: string;
 }
 
 interface ApiResponse {
-  response: [Node];
+  response: Node[];
   sources: Array<{
     score: number;
     url: string;
   }>;
+  valid_sources: Source[];
+  invalid_sources: Source[];
 }
 
 type TabType = "earnings" | "financials" | "industry" | "market";
@@ -36,7 +45,6 @@ export default function SearchResultsPage() {
       if (storedResult) {
         try {
           const parsedResult: ApiResponse = JSON.parse(storedResult);
-          console.log("data", parsedResult)
           setSearchResults(parsedResult);
         } catch (error) {
           console.error("Error parsing stored search result:", error);
@@ -95,7 +103,7 @@ export default function SearchResultsPage() {
       }
 
       setSearchResults(data);
-      addSearch(currentQuery, {query:currentQuery,...data});
+      addSearch(currentQuery, { query: currentQuery, ...data });
       localStorage.setItem("currentSearchResult", JSON.stringify(data));
     } catch (err) {
       console.error("Search error:", err);
@@ -104,6 +112,63 @@ export default function SearchResultsPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const renderSourceList = (sources: Source[], title: string) => {
+    const docTypes = Array.from(
+      new Set(sources.map((source) => source.doc_type))
+    );
+
+    return (
+      <Card className="border-[rgb(34,193,195)]">
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {docTypes.map((docType) => (
+              <div key={docType}>
+                <h4 className="font-semibold mb-2">{docType}</h4>
+                <ul className="space-y-2">
+                  {sources
+                    .filter((source) => source.doc_type === docType)
+                    .map((source, index) =>
+                      isValidUrl(source.url) ? (
+                        <li key={index}>
+                          <a
+                            href={source.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                          >
+                            <Globe className="w-4 h-4" />
+                            <span className="truncate">
+                              {new URL(source.url).hostname.replace("www.", "")}
+                            </span>
+                          </a>
+                        </li>
+                      ) : (
+                        <li key={index}>
+                          <span>Invalid URL: {source.url}</span>
+                        </li>
+                      )
+                    )}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
   };
 
   return (
@@ -160,43 +225,70 @@ export default function SearchResultsPage() {
 
       {searchResults ? (
         <>
-        <div className="container mx-auto flex flex-col gap-4">
-          {searchResults.response.length>0 && searchResults.response.map((content, index) => (
-            <div className="bg-white max-w-screen-md mx-auto w-full p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]" key={index}>
-              <div className="">
-                <div className=" overflow-hidden prose">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    className="text-gray-800"
-                    components={{
-                      a: (props) => (
-                        <a href={props.href} target="_blank" rel="noreferrer">
-                          {props.children}
-                        </a>
-                      ),
-                    }}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="lg:col-span-2 space-y-6">
+              {searchResults.response.length > 0 &&
+                searchResults.response.map((content, index) => (
+                  <div
+                    className="bg-white max-w-screen-md mx-auto w-full p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]"
+                    key={index}
                   >
-                    {content.content}
-                  </ReactMarkdown>
-                </div>
-              </div>
-              <div className="mt-3 text-blue-500 ">
-              <p className="flex gap-x-1 line-clamp-1 items-center"><Globe className="w-5 h-5"/> <a href={content.source} target="_blank"> {new URL(content.source).hostname.replace('www.', '')}</a></p>
-              </div>
+                    <div className="">
+                      <div className="overflow-hidden prose">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          className="text-gray-800"
+                          components={{
+                            a: (props) => (
+                              <a
+                                href={props.href}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {props.children}
+                              </a>
+                            ),
+                          }}
+                        >
+                          {content.content}
+                        </ReactMarkdown>
+                      </div>
+                    </div>
+                    <div className="mt-3 text-blue-500">
+                      {isValidUrl(content.source) ? (
+                        <p className="flex gap-x-1 line-clamp-1 items-center">
+                          <Globe className="w-5 h-5" />{" "}
+                          <a
+                            href={content.source}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {new URL(content.source).hostname.replace(
+                              "www.",
+                              ""
+                            )}
+                          </a>
+                        </p>
+                      ) : (
+                        <p>Source not available</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              {searchResults.response.length < 1 && <h1>No results found.</h1>}
             </div>
-          ))}
-          {
-            searchResults.response.length < 1 && (
-              <h1>No results found.</h1>
-            )
-          }
-        </div>
-          {/* <div className="mb-8 prose max-w-none">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {searchResults.response}
-            </ReactMarkdown>
-          </div> */}
 
+            <div className="space-y-6">
+              {renderSourceList(
+                searchResults.valid_sources,
+                "Found Answers From"
+              )}
+              {renderSourceList(
+                searchResults.invalid_sources,
+                "No Answer Found From"
+              )}
+            </div>
+          </div>
           <div className="grid grid-cols-1 mt-8 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <button
               className={cn(
