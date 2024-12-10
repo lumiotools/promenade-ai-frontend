@@ -14,20 +14,19 @@ interface Node {
   source: string;
 }
 
+interface Source {
+  doc_type: string;
+  url: string;
+}
+
 interface ApiResponse {
   response: Node[];
   sources: Array<{
     score: number;
     url: string;
   }>;
-  valid_sources: Array<{
-    doc_type: string;
-    url: string;
-  }>;
-  invalid_sources: Array<{
-    doc_type: string;
-    url: string;
-  }>;
+  valid_sources: Source[];
+  invalid_sources: Source[];
 }
 
 type TabType = "earnings" | "financials" | "industry" | "market";
@@ -39,7 +38,6 @@ export default function SearchResultsPage() {
   const [selectedTab, setSelectedTab] = useState<TabType>("earnings");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  console.log(selectedTab);
 
   useEffect(() => {
     const loadSearchResults = () => {
@@ -47,7 +45,6 @@ export default function SearchResultsPage() {
       if (storedResult) {
         try {
           const parsedResult: ApiResponse = JSON.parse(storedResult);
-          console.log("data", parsedResult);
           setSearchResults(parsedResult);
         } catch (error) {
           console.error("Error parsing stored search result:", error);
@@ -124,6 +121,54 @@ export default function SearchResultsPage() {
     } catch {
       return false;
     }
+  };
+
+  const renderSourceList = (sources: Source[], title: string) => {
+    const docTypes = Array.from(
+      new Set(sources.map((source) => source.doc_type))
+    );
+
+    return (
+      <Card className="border-[rgb(34,193,195)]">
+        <CardHeader>
+          <CardTitle>{title}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {docTypes.map((docType) => (
+              <div key={docType}>
+                <h4 className="font-semibold mb-2">{docType}</h4>
+                <ul className="space-y-2">
+                  {sources
+                    .filter((source) => source.doc_type === docType)
+                    .map((source, index) =>
+                      isValidUrl(source.url) ? (
+                        <li key={index}>
+                          <a
+                            href={source.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                          >
+                            <Globe className="w-4 h-4" />
+                            <span className="truncate">
+                              {new URL(source.url).hostname.replace("www.", "")}
+                            </span>
+                          </a>
+                        </li>
+                      ) : (
+                        <li key={index}>
+                          <span>Invalid URL: {source.url}</span>
+                        </li>
+                      )
+                    )}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
   };
 
   return (
@@ -234,67 +279,14 @@ export default function SearchResultsPage() {
             </div>
 
             <div className="space-y-6">
-              <Card className="border-[rgb(34,193,195)]">
-                <CardHeader>
-                  <CardTitle>Found Answers From</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {searchResults.valid_sources.map((source, index) =>
-                      isValidUrl(source.url) ? (
-                        <li key={index}>
-                          <a
-                            href={source.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
-                          >
-                            <Globe className="w-4 h-4" />
-                            <span className="truncate">
-                              {new URL(source.url).hostname.replace("www.", "")}
-                            </span>
-                          </a>
-                        </li>
-                      ) : (
-                        <li key={index}>
-                          <span>Invalid URL</span>
-                        </li>
-                      )
-                    )}
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card className="border-[rgb(34,193,195)]">
-                <CardHeader>
-                  <CardTitle>No Answer Found From</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {searchResults.invalid_sources.map((source, index) =>
-                      isValidUrl(source.url) ? (
-                        <li key={index}>
-                          <a
-                            href={source.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
-                          >
-                            <Globe className="w-4 h-4" />
-                            <span className="truncate">
-                              {new URL(source.url).hostname.replace("www.", "")}
-                            </span>
-                          </a>
-                        </li>
-                      ) : (
-                        <li key={index}>
-                          <span>Invalid URL</span>
-                        </li>
-                      )
-                    )}
-                  </ul>
-                </CardContent>
-              </Card>
+              {renderSourceList(
+                searchResults.valid_sources,
+                "Found Answers From"
+              )}
+              {renderSourceList(
+                searchResults.invalid_sources,
+                "No Answer Found From"
+              )}
             </div>
           </div>
           <div className="grid grid-cols-1 mt-8 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
