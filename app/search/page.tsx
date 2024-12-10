@@ -6,62 +6,26 @@ import { Card, CardContent } from "@/components/ui/card";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { SearchContext } from "@/app/search-context";
-import { CardHeader, CardTitle } from "../ui/card";
+import { CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-
-interface Node {
-  content: string;
-  source: string;
-}
-
-interface Source {
-  doc_type: string;
-  url: string;
-}
-
-interface ApiResponse {
-  response: Node[];
-  sources: Array<{
-    score: number;
-    url: string;
-  }>;
-  valid_sources: Source[];
-  invalid_sources: Source[];
-}
 
 type TabType = "earnings" | "financials" | "industry" | "market";
 
 export default function SearchResultsPage() {
-  const { currentQuery, setCurrentQuery, addSearch, getSearchResult } =
-    useContext(SearchContext);
-  const [searchResults, setSearchResults] = useState<ApiResponse | null>(null);
+  const {
+    currentQuery,
+    setCurrentQuery,
+    addSearch,
+    currentResult,
+    setCurrentResult,
+  } = useContext(SearchContext);
   const [selectedTab, setSelectedTab] = useState<TabType>("earnings");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadSearchResults = () => {
-      const storedResult = localStorage.getItem("searchResults");
-      if (storedResult) {
-        try {
-          const parsedResult: ApiResponse = JSON.parse(storedResult);
-          setSearchResults(parsedResult);
-        } catch (error) {
-          console.error("Error parsing stored search result:", error);
-          setSearchResults(null);
-        }
-      } else if (currentQuery) {
-        const result = getSearchResult(currentQuery);
-        if (result) {
-          setSearchResults(result);
-        } else {
-          setSearchResults(null);
-        }
-      }
-    };
-
-    loadSearchResults();
-  }, [currentQuery, getSearchResult]);
+    //This effect is no longer needed as we are directly using currentResult from context
+  }, [currentQuery]);
 
   const handleTabClick = (tab: TabType) => {
     setSelectedTab(tab);
@@ -96,19 +60,18 @@ export default function SearchResultsPage() {
         throw new Error("Network response was not ok");
       }
 
-      const data: ApiResponse = await response.json();
+      const data = await response.json();
 
       if (!data || !data.response) {
         throw new Error("Invalid response data");
       }
 
-      setSearchResults(data);
-      addSearch(currentQuery, { query: currentQuery, ...data });
-      localStorage.setItem("currentSearchResult", JSON.stringify(data));
+      setCurrentResult(data);
+      addSearch(currentQuery, data);
     } catch (err) {
       console.error("Search error:", err);
       setError("Failed to fetch search results. Please try again.");
-      setSearchResults(null);
+      setCurrentResult(null);
     } finally {
       setIsLoading(false);
     }
@@ -123,7 +86,14 @@ export default function SearchResultsPage() {
     }
   };
 
-  const renderSourceList = (sources: Source[], title: string) => {
+  const renderSourceList = (
+    sources: { doc_type: string; url: string }[],
+    title: string
+  ) => {
+    if (!sources || sources.length === 0) {
+      return null;
+    }
+
     const docTypes = Array.from(
       new Set(sources.map((source) => source.doc_type))
     );
@@ -223,12 +193,12 @@ export default function SearchResultsPage() {
         </div>
       )}
 
-      {searchResults ? (
+      {currentResult ? (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div className="lg:col-span-2 space-y-6">
-              {searchResults.response.length > 0 &&
-                searchResults.response.map((content, index) => (
+              {currentResult.response && currentResult.response.length > 0 ? (
+                currentResult.response.map((content, index) => (
                   <div
                     className="bg-white max-w-screen-md mx-auto w-full p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]"
                     key={index}
@@ -274,17 +244,19 @@ export default function SearchResultsPage() {
                       )}
                     </div>
                   </div>
-                ))}
-              {searchResults.response.length < 1 && <h1>No results found.</h1>}
+                ))
+              ) : (
+                <h1>No results found.</h1>
+              )}
             </div>
 
             <div className="space-y-6">
               {renderSourceList(
-                searchResults.valid_sources,
+                currentResult.valid_sources,
                 "Found Answers From"
               )}
               {renderSourceList(
-                searchResults.invalid_sources,
+                currentResult.invalid_sources,
                 "No Answer Found From"
               )}
             </div>
@@ -329,27 +301,28 @@ export default function SearchResultsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {searchResults.sources.map((source, index) => (
-              <Card key={index} className="rounded-xl border shadow-sm">
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-3">
-                    Source {index + 1}
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    Information from {new URL(source.url).hostname}
-                  </p>
-                  <a
-                    href={source.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-purple-500 hover:text-purple-700 inline-flex items-center"
-                  >
-                    View Source Details
-                    <ExternalLink className="ml-1 h-4 w-4" />
-                  </a>
-                </CardContent>
-              </Card>
-            ))}
+            {currentResult.sources &&
+              currentResult.sources.map((source, index) => (
+                <Card key={index} className="rounded-xl border shadow-sm">
+                  <CardContent className="p-6">
+                    <h3 className="text-xl font-semibold mb-3">
+                      Source {index + 1}
+                    </h3>
+                    <p className="text-gray-600 mb-4">
+                      Information from {new URL(source.url).hostname}
+                    </p>
+                    <a
+                      href={source.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-purple-500 hover:text-purple-700 inline-flex items-center"
+                    >
+                      View Source Details
+                      <ExternalLink className="ml-1 h-4 w-4" />
+                    </a>
+                  </CardContent>
+                </Card>
+              ))}
           </div>
 
           <div className="mt-12 text-center">

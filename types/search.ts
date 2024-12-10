@@ -3,7 +3,7 @@ export interface Node {
   source: string;
 }
 
-export interface SearchResult {
+export interface SearchResultHome {
   query: string;
   response: Node[];
   sources: { score: number; url: string }[];

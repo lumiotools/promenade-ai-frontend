@@ -4,28 +4,29 @@ import * as React from "react";
 import { useContext } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown, Menu } from "lucide-react";
-import { SearchContext } from "@/app/search-context";
+import {
+  SearchContext,
+  SearchResult,
+} from "@/app/search-context";
 import Image from "next/image";
 import logo from "../public/images/logo pro.png";
 
 export function AppSidebar() {
-  const { searches, setCurrentQuery, getSearchResult } =
+  const { searches, setCurrentQuery, setCurrentResult } =
     useContext(SearchContext);
   const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
 
   const handleNewSearch = () => {
     setCurrentQuery("");
+    setCurrentResult(null);
     router.push("/");
     setIsOpen(false);
   };
 
-  const handleSearchClick = (query: string) => {
-    setCurrentQuery(query);
-    const result = getSearchResult(query);
-    if (result) {
-      localStorage.setItem("currentSearchResult", JSON.stringify(result));
-    }
+  const handleSearchClick = (search: SearchResult) => {
+    setCurrentQuery(search.query);
+    setCurrentResult(search.result);
     router.push("/search");
     setIsOpen(false);
   };
@@ -45,7 +46,7 @@ export function AppSidebar() {
       >
         <div className="p-4 border-b border-gray-800">
           <div className="flex items-center gap-2 mb-4">
-            <Image src={logo} alt="Promenade" className="h-6" />
+            <Image src={logo} alt="Promenade" className="h-6 w-auto" />
             <span className="font-semibold">PROMENADE</span>
             <span className="text-xs px-2 py-0.5 bg-gray-800 rounded">
               BETA
@@ -62,13 +63,13 @@ export function AppSidebar() {
           </button>
         </div>
         <nav className="flex-1 overflow-y-auto h-full">
-          {searches.map((query, index) => (
+          {searches.map((search, index) => (
             <div key={index} className="px-2 py-1">
               <button
-                onClick={() => handleSearchClick(query)}
+                onClick={() => handleSearchClick(search)}
                 className="w-full flex items-center justify-between px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 rounded-lg transition-colors"
               >
-                <span className="truncate">{query}</span>
+                <span className="truncate">{search.query}</span>
                 <ChevronDown className="h-4 w-4 flex-shrink-0" />
               </button>
             </div>

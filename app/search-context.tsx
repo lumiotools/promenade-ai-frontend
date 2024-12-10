@@ -1,70 +1,80 @@
 "use client";
-import { SearchResult } from "@/types/search";
 import React, { createContext, useState, useEffect } from "react";
 
-interface SearchContextType {
-  searches: string[];
+interface Node {
+  content: string;
+  source: string;
+}
+
+interface Source {
+  doc_type: string;
+  url: string;
+}
+
+export interface ApiResponse {
+  response: Node[];
+  sources: Array<{
+    score: number;
+    url: string;
+  }>;
+  valid_sources: Source[];
+  invalid_sources: Source[];
+}
+
+export interface SearchResult {
+  query: string;
+  result: ApiResponse;
+}
+
+export interface SearchContextType {
+  searches: SearchResult[];
   currentQuery: string;
-  searchResults: SearchResult[];
+  currentResult: ApiResponse | null;
   setCurrentQuery: (query: string) => void;
-  addSearch: (query: string, result: SearchResult) => void;
-  getSearchResult: (query: string) => SearchResult | undefined;
+  addSearch: (query: string, result: ApiResponse) => void;
+  getSearchResult: (query: string) => ApiResponse | null;
+  setCurrentResult: (result: ApiResponse | null) => void;
 }
 
 export const SearchContext = createContext<SearchContextType>({
   searches: [],
   currentQuery: "",
-  searchResults: [],
+  currentResult: null,
   setCurrentQuery: () => {},
   addSearch: () => {},
-  getSearchResult: () => undefined,
+  getSearchResult: () => null,
+  setCurrentResult: () => {},
 });
 
 export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [searches, setSearches] = useState<string[]>([]);
+  const [searches, setSearches] = useState<SearchResult[]>([]);
   const [currentQuery, setCurrentQuery] = useState<string>("");
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-
-  const parseLocalStorage = <T,>(key: string, defaultValue: T[]): T[] => {
-    try {
-      const stored = localStorage.getItem(key);
-      const parsed = stored ? JSON.parse(stored) : defaultValue;
-
-      return Array.isArray(parsed) ? parsed : defaultValue;
-    } catch (error) {
-      console.error(`Error parsing ${key}:`, error);
-      return defaultValue;
-    }
-  };
+  const [currentResult, setCurrentResult] = useState<ApiResponse | null>(null);
 
   useEffect(() => {
-    setSearches(parseLocalStorage("searches", []));
-    setSearchResults(parseLocalStorage("searchResults", []));
+    const storedSearches = localStorage.getItem("searches");
+    if (storedSearches) {
+      setSearches(JSON.parse(storedSearches));
+    }
   }, []);
 
-  const addSearch = (query: string, result: SearchResult) => {
-    console.log(query, result);
-    // const updatedSearches = [
-    //   query,
-    //   ...searches.filter((s) => s !== query),
-    // ].slice(0, 20);
+  const addSearch = (query: string, result: ApiResponse) => {
+    const newSearch = { query, result };
+    const updatedSearches = [
+      newSearch,
+      ...searches.filter((s) => s.query !== query),
+    ].slice(0, 20);
 
-    // setSearches(updatedSearches);
-    // localStorage.setItem("searches", JSON.stringify(updatedSearches));
-    // console.log("")
-    // const updatedResults = [
-    //   result,
-    //   ...searchResults.filter((r) => r.query !== query),
-    // ].slice(0, 20);
-
-    // setSearchResults(updatedResults);
-    // localStorage.setItem("searchResults", JSON.stringify(updatedResults));
+    setSearches(updatedSearches);
+    setCurrentResult(result);
+    localStorage.setItem("searches", JSON.stringify(updatedSearches));
   };
 
-  const getSearchResult = (query: string) => {
-    return searchResults.find((result) => result.query === query);
+  const getSearchResult = (query: string): ApiResponse | null => {
+    const search = searches.find((s) => s.query === query);
+    return search ? search.result : null;
   };
 
   return (
@@ -72,13 +82,16 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         searches,
         currentQuery,
-        searchResults,
+        currentResult,
         setCurrentQuery,
         addSearch,
         getSearchResult,
+        setCurrentResult,
       }}
     >
       {children}
     </SearchContext.Provider>
   );
 };
+
+export default SearchProvider;

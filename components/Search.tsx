@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SearchIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SearchResult } from "@/types/search";
+import { SearchResultHome } from "@/types/search";
 
 interface SearchPageProps {
   currentQuery: string;
   setCurrentQuery: (query: string) => void;
-  addSearch: (query: string, result: SearchResult) => void;
+  addSearch: (query: string, result: SearchResultHome) => void;
 }
 
 export default function SearchPage({
