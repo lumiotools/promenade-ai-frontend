@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { Search, ExternalLink, Loader2, Globe } from "lucide-react";
+import { Search, Loader2, Globe, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { cn } from "@/lib/utils";
 import { SearchContext } from "@/app/search-context";
 import { CardHeader, CardTitle } from "../ui/card";
+import { cn } from "@/lib/utils";
 
 interface Node {
   content: string;
@@ -15,13 +15,19 @@ interface Node {
 }
 
 interface ApiResponse {
-  response: [Node];
+  response: Node[];
   sources: Array<{
     score: number;
     url: string;
   }>;
-  valid_sources: string[];
-  invalid_sources: string[];
+  valid_sources: Array<{
+    doc_type: string;
+    url: string;
+  }>;
+  invalid_sources: Array<{
+    doc_type: string;
+    url: string;
+  }>;
 }
 
 type TabType = "earnings" | "financials" | "industry" | "market";
@@ -33,6 +39,7 @@ export default function SearchResultsPage() {
   const [selectedTab, setSelectedTab] = useState<TabType>("earnings");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  console.log(selectedTab);
 
   useEffect(() => {
     const loadSearchResults = () => {
@@ -110,6 +117,15 @@ export default function SearchResultsPage() {
     }
   };
 
+  const isValidUrl = (url: string) => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 md:p-8 mt-3 md:mt-0">
       <div className="mb-8">
@@ -173,7 +189,7 @@ export default function SearchResultsPage() {
                     key={index}
                   >
                     <div className="">
-                      <div className=" overflow-hidden prose">
+                      <div className="overflow-hidden prose">
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm]}
                           className="text-gray-800"
@@ -193,14 +209,24 @@ export default function SearchResultsPage() {
                         </ReactMarkdown>
                       </div>
                     </div>
-                    <div className="mt-3 text-blue-500 ">
-                      <p className="flex gap-x-1 line-clamp-1 items-center">
-                        <Globe className="w-5 h-5" />{" "}
-                        <a href={content.source} target="_blank">
-                          {" "}
-                          {new URL(content.source).hostname.replace("www.", "")}
-                        </a>
-                      </p>
+                    <div className="mt-3 text-blue-500">
+                      {isValidUrl(content.source) ? (
+                        <p className="flex gap-x-1 line-clamp-1 items-center">
+                          <Globe className="w-5 h-5" />{" "}
+                          <a
+                            href={content.source}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {new URL(content.source).hostname.replace(
+                              "www.",
+                              ""
+                            )}
+                          </a>
+                        </p>
+                      ) : (
+                        <p>Source not available</p>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -214,21 +240,27 @@ export default function SearchResultsPage() {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {searchResults.valid_sources.map((source, index) => (
-                      <li key={index}>
-                        <a
-                          href={source}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
-                        >
-                          <Globe className="w-4 h-4" />
-                          <span className="truncate">
-                            {new URL(source).hostname.replace("www.", "")}
-                          </span>
-                        </a>
-                      </li>
-                    ))}
+                    {searchResults.valid_sources.map((source, index) =>
+                      isValidUrl(source.url) ? (
+                        <li key={index}>
+                          <a
+                            href={source.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                          >
+                            <Globe className="w-4 h-4" />
+                            <span className="truncate">
+                              {new URL(source.url).hostname.replace("www.", "")}
+                            </span>
+                          </a>
+                        </li>
+                      ) : (
+                        <li key={index}>
+                          <span>Invalid URL</span>
+                        </li>
+                      )
+                    )}
                   </ul>
                 </CardContent>
               </Card>
@@ -239,32 +271,32 @@ export default function SearchResultsPage() {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {searchResults.invalid_sources.map((source, index) => (
-                      <li key={index}>
-                        <a
-                          href={source}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
-                        >
-                          <Globe className="w-4 h-4" />
-                          <span className="truncate">
-                            {new URL(source).hostname.replace("www.", "")}
-                          </span>
-                        </a>
-                      </li>
-                    ))}
+                    {searchResults.invalid_sources.map((source, index) =>
+                      isValidUrl(source.url) ? (
+                        <li key={index}>
+                          <a
+                            href={source.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                          >
+                            <Globe className="w-4 h-4" />
+                            <span className="truncate">
+                              {new URL(source.url).hostname.replace("www.", "")}
+                            </span>
+                          </a>
+                        </li>
+                      ) : (
+                        <li key={index}>
+                          <span>Invalid URL</span>
+                        </li>
+                      )
+                    )}
                   </ul>
                 </CardContent>
               </Card>
             </div>
           </div>
-          {/* <div className="mb-8 prose max-w-none">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {searchResults.response}
-            </ReactMarkdown>
-          </div> */}
-
           <div className="grid grid-cols-1 mt-8 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <button
               className={cn(
