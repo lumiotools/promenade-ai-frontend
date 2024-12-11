@@ -86,6 +86,31 @@ export default function SearchResultsPage() {
     }
   };
 
+  const getFileNameFromUrl = (url: string) => {
+    try {
+      const pathname = new URL(url).pathname;
+      let filename = pathname.split("/").pop() || "";
+
+      if (filename) {
+        filename = filename.replace(/\.[^/.]+$/, "");
+        filename = filename.replace(/[-_]/g, " ");
+        filename = filename
+          .split(" ")
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(" ");
+
+        if (filename.length > 45) {
+          filename = filename.substring(0, 42) + "...";
+        }
+        return filename;
+      }
+
+      return url.length > 45 ? url.substring(0, 42) + "..." : url;
+    } catch {
+      return url.length > 45 ? url.substring(0, 42) + "..." : url;
+    }
+  };
+
   const renderSourceList = (
     sources: { doc_type: string; url: string }[],
     title: string
@@ -118,11 +143,11 @@ export default function SearchResultsPage() {
                             href={source.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+                            className="flex items-center gap-2 text-sm text-blue-600 hover:underline w-full max-w-[300px]"
                           >
-                            <Globe className="w-4 h-4" />
-                            <span className="truncate">
-                              {new URL(source.url).hostname.replace("www.", "")}
+                            <Globe className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate inline-block w-full">
+                              {getFileNameFromUrl(source.url)}
                             </span>
                           </a>
                         </li>
@@ -233,10 +258,7 @@ export default function SearchResultsPage() {
                             target="_blank"
                             rel="noreferrer"
                           >
-                            {new URL(content.source).hostname.replace(
-                              "www.",
-                              ""
-                            )}
+                            {getFileNameFromUrl(content.source)}
                           </a>
                         </p>
                       ) : (
@@ -309,7 +331,7 @@ export default function SearchResultsPage() {
                       Source {index + 1}
                     </h3>
                     <p className="text-gray-600 mb-4">
-                      Information from {new URL(source.url).hostname}
+                      {getFileNameFromUrl(source.url)}
                     </p>
                     <a
                       href={source.url}
