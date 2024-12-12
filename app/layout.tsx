@@ -3,6 +3,7 @@ import { SearchProvider } from "./search-context";
 import "./globals.css";
 import { AppSidebar } from "@/components/Sidebar";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,14 +32,16 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased h-full overflow-hidden`}
       >
-        <SearchProvider>
-          <div className="flex h-full">
-            <AppSidebar />
-            <main className="flex-1 overflow-auto ml-0 md:ml-64 bg-white h-full">
-              {children}
-            </main>
-          </div>
-        </SearchProvider>
+        <Suspense>
+          <SearchProvider>
+            <div className="flex h-full">
+              <AppSidebar />
+              <main className="flex-1 overflow-auto ml-0 md:ml-64 bg-white h-full">
+                {children}
+              </main>
+            </div>
+          </SearchProvider>
+        </Suspense>
       </body>
     </html>
   );
