@@ -42,12 +42,12 @@ export default function SearchResultsPage() {
 
   const searchQuery = useSearchParams().get("query");
 
-  useEffect(()=>{
-    if(searchQuery) {
-      setCurrentQuery(searchQuery)
-      handleSearch(searchQuery)
+  useEffect(() => {
+    if (searchQuery) {
+      setCurrentQuery(searchQuery);
+      handleSearch(searchQuery);
     }
-  },[searchQuery])
+  }, [searchQuery]);
 
   // useEffect(() => {
   //   const loadSearchResults = () => {
@@ -77,8 +77,7 @@ export default function SearchResultsPage() {
     setSelectedTab(tab);
   };
 
-  const handleSearch = async (query:string) => {
-
+  const handleSearch = async (query: string) => {
     if (!query.trim()) {
       setError("Please enter a search query");
       return;
@@ -184,7 +183,10 @@ export default function SearchResultsPage() {
     <div className="container mx-auto p-4 md:p-8 mt-3 md:mt-0">
       <div className="mb-8">
         <form
-          onSubmit={()=>handleSearch(currentQuery)}
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleSearch(currentQuery);
+          }}
           className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8"
         >
           <div className="relative w-full md:w-3/4 max-w-2xl">
