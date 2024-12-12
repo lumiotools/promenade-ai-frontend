@@ -125,7 +125,7 @@ export default function SearchResultsPage() {
 
   const renderSourceList = (sources: Source[], title: string) => {
     const docTypes = Array.from(
-      new Set(sources.map((source) => source.doc_type))
+      new Set(sources?.map((source) => source.doc_type))
     );
 
     return (
@@ -227,7 +227,7 @@ export default function SearchResultsPage() {
         <>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div className="lg:col-span-2 space-y-6">
-              {searchResults.response.length > 0 &&
+              {searchResults.response?.length > 0 &&
                 searchResults.response.map((content, index) => (
                   <div
                     className="bg-white max-w-screen-md mx-auto w-full p-4 rounded-lg shadow-xl overflow-hidden border  border-[rgb(34,193,195)]"
@@ -275,7 +275,7 @@ export default function SearchResultsPage() {
                     </div>
                   </div>
                 ))}
-              {searchResults.response.length < 1 && <h1>No results found.</h1>}
+              {searchResults.response?.length < 1 && <h1>No results found.</h1>}
             </div>
 
             <div className="space-y-6">
@@ -329,7 +329,7 @@ export default function SearchResultsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {searchResults.sources.map((source, index) => (
+            {searchResults.sources?.map((source, index) => (
               <Card key={index} className="rounded-xl border shadow-sm">
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold mb-3">
