@@ -33,10 +33,11 @@ interface ApiResponse {
 type TabType = "earnings" | "financials" | "industry" | "market";
 
 export default function SearchResultsPage() {
-  const { currentQuery, setCurrentQuery,
+  const {
+    currentQuery,
+    setCurrentQuery,
     //  addSearch, getSearchResult
-     } =
-    useContext(SearchContext);
+  } = useContext(SearchContext);
   const [searchResults, setSearchResults] = useState<ApiResponse | null>(null);
   const [selectedTab, setSelectedTab] = useState<TabType>("earnings");
   const [isLoading, setIsLoading] = useState(false);
@@ -379,12 +380,14 @@ export default function SearchResultsPage() {
             </div>
           </div>
         </>
-      ) : (
+      ) : !isLoading ? (
         <div className="text-center mt-8">
           <p className="text-xl text-gray-600">
             No search results available. Please perform a search.
           </p>
         </div>
+      ) : (
+        <></>
       )}
     </div>
   );
