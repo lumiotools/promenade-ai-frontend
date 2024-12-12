@@ -15,7 +15,7 @@ interface SearchPageProps {
 export default function SearchPage({
   currentQuery,
   setCurrentQuery,
-  addSearch,
+  // addSearch,
 }: SearchPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

@@ -33,7 +33,9 @@ interface ApiResponse {
 type TabType = "earnings" | "financials" | "industry" | "market";
 
 export default function SearchResultsPage() {
-  const { currentQuery, setCurrentQuery, addSearch, getSearchResult } =
+  const { currentQuery, setCurrentQuery,
+    //  addSearch, getSearchResult
+     } =
     useContext(SearchContext);
   const [searchResults, setSearchResults] = useState<ApiResponse | null>(null);
   const [selectedTab, setSelectedTab] = useState<TabType>("earnings");
