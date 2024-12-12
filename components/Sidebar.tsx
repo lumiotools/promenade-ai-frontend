@@ -24,7 +24,7 @@ export function AppSidebar() {
     setCurrentQuery(query);
     const result = getSearchResult(query);
     if (result) {
-      localStorage.setItem("currentSearchResult", JSON.stringify(result));
+      // localStorage.setItem("currentSearchResult", JSON.stringify(result));
     }
     router.push("/search");
     setIsOpen(false);

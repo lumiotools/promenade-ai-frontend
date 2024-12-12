@@ -8,6 +8,7 @@ import remarkGfm from "remark-gfm";
 import { SearchContext } from "@/app/search-context";
 import { CardHeader, CardTitle } from "../ui/card";
 import { cn } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
 
 interface Node {
   content: string;
@@ -39,38 +40,46 @@ export default function SearchResultsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadSearchResults = () => {
-      const storedResult = localStorage.getItem("searchResults");
-      if (storedResult) {
-        try {
-          const parsedResult: ApiResponse = JSON.parse(storedResult);
-          setSearchResults(parsedResult);
-        } catch (error) {
-          console.error("Error parsing stored search result:", error);
-          setSearchResults(null);
-        }
-      } else if (currentQuery) {
-        const result = getSearchResult(currentQuery);
-        if (result) {
-          setSearchResults(result);
-        } else {
-          setSearchResults(null);
-        }
-      }
-    };
+  const searchQuery = useSearchParams().get("query");
 
-    loadSearchResults();
-  }, [currentQuery, getSearchResult]);
+  useEffect(()=>{
+    if(searchQuery) {
+      setCurrentQuery(searchQuery)
+      handleSearch(searchQuery)
+    }
+  },[searchQuery])
+
+  // useEffect(() => {
+  //   const loadSearchResults = () => {
+  //     const storedResult = localStorage.getItem("searchResults");
+  //     if (storedResult) {
+  //       try {
+  //         const parsedResult: ApiResponse = JSON.parse(storedResult);
+  //         setSearchResults(parsedResult);
+  //       } catch (error) {
+  //         console.error("Error parsing stored search result:", error);
+  //         setSearchResults(null);
+  //       }
+  //     } else if (currentQuery) {
+  //       const result = getSearchResult(currentQuery);
+  //       if (result) {
+  //         setSearchResults(result);
+  //       } else {
+  //         setSearchResults(null);
+  //       }
+  //     }
+  //   };
+
+  //   loadSearchResults();
+  // }, [currentQuery, getSearchResult]);
 
   const handleTabClick = (tab: TabType) => {
     setSelectedTab(tab);
   };
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = async (query:string) => {
 
-    if (!currentQuery.trim()) {
+    if (!query.trim()) {
       setError("Please enter a search query");
       return;
     }
@@ -87,7 +96,7 @@ export default function SearchResultsPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            message: currentQuery,
+            message: query,
           }),
         }
       );
@@ -103,8 +112,8 @@ export default function SearchResultsPage() {
       }
 
       setSearchResults(data);
-      addSearch(currentQuery, { query: currentQuery, ...data });
-      localStorage.setItem("currentSearchResult", JSON.stringify(data));
+      // addSearch(currentQuery, { query: currentQuery, ...data });
+      // localStorage.setItem("currentSearchResult", JSON.stringify(data));
     } catch (err) {
       console.error("Search error:", err);
       setError("Failed to fetch search results. Please try again.");
@@ -175,7 +184,7 @@ export default function SearchResultsPage() {
     <div className="container mx-auto p-4 md:p-8 mt-3 md:mt-0">
       <div className="mb-8">
         <form
-          onSubmit={handleSearch}
+          onSubmit={()=>handleSearch(currentQuery)}
           className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8"
         >
           <div className="relative w-full md:w-3/4 max-w-2xl">

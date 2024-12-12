@@ -30,32 +30,32 @@ export default function SearchPage({
       return;
     }
 
-    setIsLoading(true);
+    // setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/chat`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            message: currentQuery,
-            mode: searchMode,
-          }),
-        }
-      );
+      // const response = await fetch(
+      //   `${process.env.NEXT_PUBLIC_SERVER_URL}/chat`,
+      //   {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({
+      //       message: currentQuery,
+      //       mode: searchMode,
+      //     }),
+      //   }
+      // );
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
+      // if (!response.ok) {
+      //   throw new Error("Network response was not ok");
+      // }
 
-      const data = await response.json();
-      localStorage.setItem("searchResults", JSON.stringify(data));
-      addSearch(currentQuery, { query: currentQuery, ...data });
-      router.push("/search");
+      // const data = await response.json();
+      // localStorage.setItem("searchResults", JSON.stringify(data));
+      // addSearch(currentQuery, { query: currentQuery, ...data });
+      router.push(`/search?query=${encodeURIComponent(currentQuery)}`);
     } catch (err) {
       setError("Failed to fetch search results. Please try again.");
       console.error(err);

@@ -29,10 +29,10 @@ export const SearchProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const parseLocalStorage = <T,>(key: string, defaultValue: T[]): T[] => {
     try {
-      const stored = localStorage.getItem(key);
-      const parsed = stored ? JSON.parse(stored) : defaultValue;
-
-      return Array.isArray(parsed) ? parsed : defaultValue;
+      // const stored = localStorage.getItem(key);
+      // const parsed = stored ? JSON.parse(stored) : defaultValue;
+      // return Array.isArray(parsed) ? parsed : defaultValue;
+      return defaultValue;
     } catch (error) {
       console.error(`Error parsing ${key}:`, error);
       return defaultValue;
