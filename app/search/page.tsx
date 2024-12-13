@@ -13,6 +13,7 @@ import { useSearchParams } from "next/navigation";
 interface Node {
   content: string;
   source: string;
+  doc_type: string;
 }
 
 interface Source {
@@ -268,24 +269,27 @@ export default function SearchResultsPage() {
                         </ReactMarkdown>
                       </div>
                     </div>
-                    <div className="mt-3 text-blue-500">
-                      {isValidUrl(content.source) ? (
-                        <p className="flex gap-x-1 line-clamp-1 items-center">
-                          <Globe className="w-5 h-5" />{" "}
-                          <a
-                            href={content.source}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            {new URL(content.source).hostname.replace(
-                              "www.",
-                              ""
-                            )}
-                          </a>
-                        </p>
-                      ) : (
-                        <p>Source not available</p>
-                      )}
+                    <div className="mt-3 flex justify-between items-center">
+                      <div className="text-blue-500">
+                        {isValidUrl(content.source) ? (
+                          <p className="flex gap-x-1 line-clamp-1 items-center">
+                            <Globe className="w-5 h-5" />{" "}
+                            <a
+                              href={content.source}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {new URL(content.source).hostname.replace(
+                                "www.",
+                                ""
+                              )}
+                            </a>
+                          </p>
+                        ) : (
+                          <p>Source not available</p>
+                        )}
+                      </div>
+                      <div className="px-2 py-1 text-purple-500 border-2 border-purple-200 bg-purple-100 rounded-lg transition-colors">{content.doc_type}</div>
                     </div>
                   </div>
                 ))}
