@@ -2,18 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  SearchIcon,
-  Loader2,
-  Eye,
-  Telescope,
-  Building2,
-} from "lucide-react";
+import { SearchIcon, Loader2, Eye, Telescope, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SearchResult } from "@/types/search";
 import Image from "next/image";
 import ValueChain from "../public/icons/value-chain.png";
-import Birdeye from "../public/icons/Birdeye.png";
+import Birdeye from "../public/icons/Birdeye.png"
 import { CompanyProfileModal } from "../components/CompanyProfileModal";
 import { MarketingTrendsModal } from "../components/MarketingTrendsModal";
 import { ValueChainModal } from "../components/ValueChainModal";
