@@ -2,9 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { SearchIcon, Loader2 } from "lucide-react";
+import {
+  SearchIcon,
+  Loader2,
+  Eye,
+  Telescope,
+  Building2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SearchResult } from "@/types/search";
+import Image from "next/image";
+import ValueChain from "../public/icons/value-chain.png"
+import Birdeye from "../public/icons/Birdeye.png"
 
 interface SearchPageProps {
   currentQuery: string;
@@ -15,100 +24,49 @@ interface SearchPageProps {
 export default function SearchPage({
   currentQuery,
   setCurrentQuery,
-  // addSearch,
 }: SearchPageProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchMode, setSearchMode] = useState<"sec" | "all">("all");
+  const [searchMode, setSearchMode] = useState<"sec" | "all" | "upload">("all");
   const router = useRouter();
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!currentQuery.trim()) {
       setError("Please enter a search query");
       return;
     }
-
-    // setIsLoading(true);
     setError(null);
-
-    try {
-      // const response = await fetch(
-      //   `${process.env.NEXT_PUBLIC_SERVER_URL}/chat`,
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({
-      //       message: currentQuery,
-      //       mode: searchMode,
-      //     }),
-      //   }
-      // );
-
-      // if (!response.ok) {
-      //   throw new Error("Network response was not ok");
-      // }
-
-      // const data = await response.json();
-      // localStorage.setItem("searchResults", JSON.stringify(data));
-      // addSearch(currentQuery, { query: currentQuery, ...data });
-      router.push(`/search?query=${encodeURIComponent(currentQuery)}`);
-    } catch (err) {
-      setError("Failed to fetch search results. Please try again.");
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
+    router.push(`/search?query=${encodeURIComponent(currentQuery)}`);
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4">
-      <div className="w-full max-w-3xl text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2 flex flex-col md:flex-row items-center justify-center gap-2">
-          <span
-            style={{
-              background: "linear-gradient(to right, #00ffcc, #00ccff)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            Search
-          </span>
-          <span className="text-[#301111]">for any topics</span>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 mt-10 md:mt-0">
+      <div className="w-full max-w-5xl text-center">
+        <h1 className="text-3xl md:text-3xl font-medium mb-6">
+          Search for any topics
         </h1>
 
         <form
           onSubmit={handleSearch}
-          className="flex flex-col md:flex-row items-center justify-center gap-4 mt-8"
+          className="w-full max-w-3xl mx-auto mb-8 flex gap-4"
         >
-          <div className="relative w-full md:w-3/4 max-w-2xl">
-            <SearchIcon className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+          <div className="relative flex-1">
+            <SearchIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Search"
               value={currentQuery}
               onChange={(e) => setCurrentQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-full focus:outline-none text-gray-700 placeholder-gray-500"
-              style={{
-                border: "1.5px solid transparent",
-                borderRadius: "9999px",
-                backgroundImage:
-                  "linear-gradient(white, white), linear-gradient(299.73deg, #B689FF 18.18%, #00EC9D 100.4%, #B588FE 210.75%, #D3FF95 297.18%)",
-                backgroundOrigin: "border-box",
-                backgroundClip: "padding-box, border-box",
-              }}
+              className="w-full pl-12 pr-4 py-2 rounded-xl border border-[#B0B0B0] focus:outline-none focus:ring-1 focus:ring-purple-100 focus:border-purple-400 text-gray-700 placeholder-gray-500 text-lg bg-white"
             />
           </div>
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full md:w-auto rounded-full px-6 py-3 font-medium text-white transition-opacity disabled:opacity-50"
+            className="px-6 py-1.5 rounded-xl font-medium text-white transition-opacity disabled:opacity-50 bg-[#7F56D9]"
             style={{
-              background:
-                "linear-gradient(285.8deg, #B689FF 11.03%, #00EC9D 50%, #D3FF95 88.97%)",
+              background: "linear-gradient(to right, #8B5CF6, #6366F1)",
             }}
           >
             {isLoading ? (
@@ -122,14 +80,12 @@ export default function SearchPage({
           </button>
         </form>
 
-        <div className="flex flex-col md:flex-row justify-center gap-4 mt-4">
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
           <button
             type="button"
             className={cn(
-              "px-6 py-2 rounded-full transition-colors border border-purple-50",
-              searchMode === "sec"
-                ? "bg-[#8B5CF6] text-white"
-                : "text-[#8B5CF6] hover:bg-purple-50 border-purple-50"
+              "px-6 py-2 rounded-xl transition-colors border text-sm text-[#545454]",
+              searchMode === "sec" ? "bg-white" : "bg-[#F3F3F3]"
             )}
             onClick={() => setSearchMode("sec")}
           >
@@ -138,19 +94,77 @@ export default function SearchPage({
           <button
             type="button"
             className={cn(
-              "px-6 py-2 rounded-full transition-colors border border-purple-50",
-              searchMode === "all"
-                ? "bg-[#8B5CF6] text-white"
-                : "text-[#8B5CF6] hover:bg-purple-50"
+              "px-6 py-2 rounded-xl transition-colors border text-sm text-[#545454]",
+              searchMode === "all" ? "bg-white" : "bg-[#F3F3F3]"
             )}
             onClick={() => setSearchMode("all")}
           >
             All sources including web
           </button>
+          <button
+            type="button"
+            className={cn(
+              "px-6 py-2 rounded-xl transition-colors border text-sm text-[#545454]",
+              searchMode === "upload" ? "bg-white" : "bg-[#F3F3F3]"
+            )}
+            onClick={() => setSearchMode("upload")}
+          >
+            Upload Internal File
+          </button>
+        </div>
+
+        <div className="flex flex-col md:flex-row w-full mt-16 mb-3 items-center justify-between">
+          <div></div>
+          <h2 className="text-base font-light mb-2 text-[#333333]">
+            Discover Key Insights to Enhance Your Search
+          </h2>
+          <button className="hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-2 px-3 text-[#333333] rounded-lg">
+            <Eye className="w-3 h-3" />
+            See Preview
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="p-6 rounded-xl border border-gray-200 text-left">
+            <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
+              <Telescope className="w-5 h-5" />
+            </div>
+            <h3 className="font-semibold mb-2">Marketing Trends</h3>
+            <p className="text-sm text-gray-600">
+              Get a comprehensive overview of key competitors
+            </p>
+          </div>
+          <div className="p-6 rounded-xl border border-gray-200 text-left">
+            <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <h3 className="font-semibold mb-2">Company Profile</h3>
+            <p className="text-sm text-gray-600">
+              Get a quick snapshot of a company
+            </p>
+          </div>
+          <div className="p-6 rounded-xl border border-gray-200 text-left">
+            <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
+            <Image src={ValueChain} alt="" className="w-5 h-5"></Image>
+            </div>
+            <h3 className="font-semibold mb-2">Value Chain</h3>
+            <p className="text-sm text-gray-600">
+              Analyze an end-to-end industry/segment value chain
+            </p>
+          </div>
+          <div className="p-6 rounded-xl border border-gray-200 text-left">
+            <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
+            <Image src={Birdeye} alt="" className="w-5 h-5"></Image>
+            </div>
+            <h3 className="font-semibold mb-2">Marketing Map</h3>
+            <p className="text-sm text-gray-600">
+              Get a detailed breakdown of market segments
+            </p>
+          </div>
         </div>
 
         {error && (
-          <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-full relative w-full max-w-3xl mx-auto">
+          <div className="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative w-full max-w-3xl mx-auto">
             {error}
           </div>
         )}

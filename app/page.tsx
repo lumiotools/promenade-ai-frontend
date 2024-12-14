@@ -9,7 +9,7 @@ export default function Home() {
     useContext(SearchContext);
 
   return (
-    <div className="p-4 md:p-8">
+    <div className="min-h-screen flex items-center justify-center">
       <SearchPage
         currentQuery={currentQuery}
         setCurrentQuery={setCurrentQuery}
