@@ -2,14 +2,23 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { SearchIcon, Loader2, Eye, Telescope, Building2 } from "lucide-react";
+import {
+  SearchIcon,
+  Loader2,
+  Eye,
+  Telescope,
+  Building2,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SearchResult } from "@/types/search";
 import Image from "next/image";
 import ValueChain from "../public/icons/value-chain.png";
 import Birdeye from "../public/icons/Birdeye.png";
-import { CompanyProfileModal } from "./CompanyProfileModal";
-import { LoadingCard } from "./LoadingCard";
+import { CompanyProfileModal } from "../components/CompanyProfileModal";
+import { MarketingTrendsModal } from "../components/MarketingTrendsModal";
+import { ValueChainModal } from "../components/ValueChainModal";
+import { MarketingMapModal } from "../components/MarketingMapModal";
+import { LoadingCard } from "../components/LoadingCard";
 
 interface SearchPageProps {
   currentQuery: string;
@@ -24,7 +33,7 @@ export default function SearchPage({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchMode, setSearchMode] = useState<"sec" | "all" | "upload">("sec");
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<string | null>(null);
   const router = useRouter();
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -39,8 +48,8 @@ export default function SearchPage({
 
   const handleModalSubmit = async () => {
     setIsLoading(true);
-    setIsModalOpen(false);
-    await new Promise((resolve) => setTimeout(resolve, 200000));
+    setActiveModal(null);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     setIsLoading(false);
   };
 
@@ -49,7 +58,8 @@ export default function SearchPage({
       <div
         className={cn(
           "flex-grow flex flex-col items-center justify-center p-4 mt-10 md:mt-0 transition-all duration-200",
-          (isModalOpen || isLoading) && "blur-[2px] pointer-events-none"
+          (activeModal !== null || isLoading) &&
+            "blur-[2px] pointer-events-none"
         )}
       >
         <div className="w-full max-w-5xl text-center">
@@ -135,7 +145,10 @@ export default function SearchPage({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="p-6 rounded-xl border border-gray-200 text-left">
+            <div
+              className="p-6 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors"
+              onClick={() => setActiveModal("marketingTrends")}
+            >
               <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
                 <Telescope className="w-5 h-5" />
               </div>
@@ -146,7 +159,7 @@ export default function SearchPage({
             </div>
             <div
               className="p-6 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors"
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => setActiveModal("companyProfile")}
             >
               <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
                 <Building2 className="w-5 h-5" />
@@ -156,18 +169,24 @@ export default function SearchPage({
                 Get a quick snapshot of a company
               </p>
             </div>
-            <div className="p-6 rounded-xl border border-gray-200 text-left">
+            <div
+              className="p-6 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors"
+              onClick={() => setActiveModal("valueChain")}
+            >
               <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
-                <Image src={ValueChain} alt="" className="w-5 h-5" />
+                <Image src={ValueChain} alt="Value Chain" className="w-5 h-5" />
               </div>
               <h3 className="font-semibold mb-2">Value Chain</h3>
               <p className="text-sm text-gray-600">
                 Analyze an end-to-end industry/segment value chain
               </p>
             </div>
-            <div className="p-6 rounded-xl border border-gray-200 text-left">
+            <div
+              className="p-6 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors"
+              onClick={() => setActiveModal("marketingMap")}
+            >
               <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
-                <Image src={Birdeye} alt="" className="w-5 h-5" />
+                <Image src={Birdeye} alt="Marketing Map" className="w-5 h-5" />
               </div>
               <h3 className="font-semibold mb-2">Marketing Map</h3>
               <p className="text-sm text-gray-600">
@@ -184,13 +203,36 @@ export default function SearchPage({
         </div>
       </div>
 
-      {isModalOpen && (
+      {activeModal && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <CompanyProfileModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onSubmit={handleModalSubmit}
-          />
+          {activeModal === "marketingTrends" && (
+            <MarketingTrendsModal
+              isOpen={true}
+              onClose={() => setActiveModal(null)}
+              onSubmit={handleModalSubmit}
+            />
+          )}
+          {activeModal === "companyProfile" && (
+            <CompanyProfileModal
+              isOpen={true}
+              onClose={() => setActiveModal(null)}
+              onSubmit={handleModalSubmit}
+            />
+          )}
+          {activeModal === "valueChain" && (
+            <ValueChainModal
+              isOpen={true}
+              onClose={() => setActiveModal(null)}
+              onSubmit={handleModalSubmit}
+            />
+          )}
+          {activeModal === "marketingMap" && (
+            <MarketingMapModal
+              isOpen={true}
+              onClose={() => setActiveModal(null)}
+              onSubmit={handleModalSubmit}
+            />
+          )}
         </div>
       )}
 
