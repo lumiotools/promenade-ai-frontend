@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { CompanyInfoCard } from "./CompanyInfoCard";
 import Source1 from "../public/images/Source1.png";
@@ -6,11 +6,11 @@ import Source2 from "../public/images/Source2.png";
 import Source3 from "../public/images/Source3.png";
 import Source4 from "../public/images/Source4.png";
 
-const sources = {
-  yahoo: { id: "yahoo", source: Source1 },
-  amazon: { id: "amazon", source: Source2 },
-  iex: { id: "iex", source: Source3 },
-  polygon: { id: "polygon", source: Source4 },
+export const sources = {
+  yahoo: { id: "yahoo", name: "Yahoo finance", source: Source1 },
+  finazon: { id: "finazon", name: "Finazon", source: Source2 },
+  iex: { id: "iex", name: "IEX Cloud", source: Source3 },
+  polygon: { id: "polygon", name: "Polygon.io", source: Source4 },
 };
 
 export function InfoGrid() {
@@ -18,7 +18,7 @@ export function InfoGrid() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 py-2">
       <CompanyInfoCard
         title="Products & Brands"
-        sources={[sources.yahoo, sources.amazon, sources.iex, sources.polygon]}
+        sources={[sources.yahoo, sources.finazon, sources.iex, sources.polygon]}
       >
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
@@ -27,8 +27,8 @@ export function InfoGrid() {
           </p>
           <ul className="space-y-2 text-sm">
             <li>
-              <span className="font-semibold">Consumer Products:</span> L&apos;Oréal
-              Paris, Garnier, Maybelline, NYX Cosmetics
+              <span className="font-semibold">Consumer Products:</span>{" "}
+              L&apos;Oréal Paris, Garnier, Maybelline, NYX Cosmetics
             </li>
             <li>
               <span className="font-semibold">Luxe Division:</span> Lancôme,
@@ -48,7 +48,7 @@ export function InfoGrid() {
 
       <CompanyInfoCard
         title="Business Model"
-        sources={[sources.yahoo, sources.amazon, sources.iex]}
+        sources={[sources.yahoo, sources.finazon, sources.iex]}
       >
         <p className="text-sm text-muted-foreground">
           L&apos;Oréal operates a multi-channel distribution strategy, including
@@ -60,18 +60,18 @@ export function InfoGrid() {
 
       <CompanyInfoCard
         title="Customers"
-        sources={[sources.yahoo, sources.amazon, sources.iex]}
+        sources={[sources.yahoo, sources.finazon, sources.iex]}
       >
         <p className="text-sm text-muted-foreground">
-          L&apos;Oréal&apos;s customers range from mass-market consumers to luxury buyers,
-          professional hairdressers, and dermatologists, catering to diverse
-          beauty needs worldwide.
+          L&apos;Oréal&apos;s customers range from mass-market consumers to
+          luxury buyers, professional hairdressers, and dermatologists, catering
+          to diverse beauty needs worldwide.
         </p>
       </CompanyInfoCard>
 
       <CompanyInfoCard
         title="Geographic Presence"
-        sources={[sources.yahoo, sources.amazon, sources.iex, sources.polygon]}
+        sources={[sources.yahoo, sources.finazon, sources.iex, sources.polygon]}
       >
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
@@ -83,8 +83,8 @@ export function InfoGrid() {
               <span className="font-semibold">HQ:</span> Paris, France
             </li>
             <li>
-              <span className="font-semibold">Operation:</span> L&apos;Oreal has a
-              global presence with operations in over 150 countries, including
+              <span className="font-semibold">Operation:</span> L&apos;Oreal has
+              a global presence with operations in over 150 countries, including
               major markets in North America, Europe, Asia, and Latin America.
               Their headquarters are in Clichy, France.
             </li>
