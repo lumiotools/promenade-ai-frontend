@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { SearchResult } from "@/types/search";
 import Image from "next/image";
 import ValueChain from "../public/icons/value-chain.png";
-import Birdeye from "../public/icons/Birdeye.png"
+import Birdeye from "../public/icons/Birdeye.png";
 import { CompanyProfileModal } from "../components/CompanyProfileModal";
 import { MarketingTrendsModal } from "../components/MarketingTrendsModal";
 import { ValueChainModal } from "../components/ValueChainModal";
@@ -29,6 +29,11 @@ export default function SearchPage({
   const [searchMode, setSearchMode] = useState<"sec" | "all" | "upload">("sec");
   const [activeModal, setActiveModal] = useState<string | null>(null);
   const router = useRouter();
+
+  const handleCompanyProfileSearch = () => {
+    setIsLoading(false);
+    router.push("/company-profile");
+  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -234,7 +239,7 @@ export default function SearchPage({
         <div className="absolute inset-0 flex items-center justify-center">
           <LoadingCard
             companyName="Nvidia"
-            onBack={() => setIsLoading(false)}
+            onBack={handleCompanyProfileSearch}
           />
         </div>
       )}
