@@ -9,6 +9,7 @@ import Image from "next/image";
 import ValueChain from "../public/icons/value-chain.png";
 import Birdeye from "../public/icons/Birdeye.png";
 import { CompanyProfileModal } from "./CompanyProfileModal";
+import { LoadingCard } from "./LoadingCard";
 
 interface SearchPageProps {
   currentQuery: string;
@@ -20,9 +21,9 @@ export default function SearchPage({
   currentQuery,
   setCurrentQuery,
 }: SearchPageProps) {
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchMode, setSearchMode] = useState<"sec" | "all" | "upload">("all");
+  const [searchMode, setSearchMode] = useState<"sec" | "all" | "upload">("sec");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
@@ -36,18 +37,21 @@ export default function SearchPage({
     router.push(`/search?query=${encodeURIComponent(currentQuery)}`);
   };
 
-  const handleModalSubmit = (data: {
-    url: string;
-    businessLine: string;
-    country: string;
-  }) => {
-    console.log("Form submitted:", data);
+  const handleModalSubmit = async () => {
+    setIsLoading(true);
     setIsModalOpen(false);
+    await new Promise((resolve) => setTimeout(resolve, 200000));
+    setIsLoading(false);
   };
 
   return (
-    <>
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 mt-10 md:mt-0">
+    <div className="relative min-h-screen flex flex-col">
+      <div
+        className={cn(
+          "flex-grow flex flex-col items-center justify-center p-4 mt-10 md:mt-0 transition-all duration-200",
+          (isModalOpen || isLoading) && "blur-[2px] pointer-events-none"
+        )}
+      >
         <div className="w-full max-w-5xl text-center">
           <h1 className="text-3xl md:text-3xl font-medium mb-6">
             Search for any topics
@@ -180,11 +184,24 @@ export default function SearchPage({
         </div>
       </div>
 
-      <CompanyProfileModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSubmit={handleModalSubmit}
-      />
-    </>
+      {isModalOpen && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <CompanyProfileModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSubmit={handleModalSubmit}
+          />
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <LoadingCard
+            companyName="Nvidia"
+            onBack={() => setIsLoading(false)}
+          />
+        </div>
+      )}
+    </div>
   );
 }
