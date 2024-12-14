@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { Search, Share2, MoreVertical, Globe } from "lucide-react";
+import { Search, Share2, MoreVertical, Globe, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ReactMarkdown from "react-markdown";
@@ -37,6 +37,7 @@ export default function SearchResultsPage() {
   const [searchResults, setSearchResults] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showAiSummary, setShowAiSummary] = useState(false);
 
   const searchQuery = useSearchParams().get("query");
 
@@ -99,28 +100,6 @@ export default function SearchResultsPage() {
     }
   };
 
-  // const getFileNameFromUrl = (url: string) => {
-  //   try {
-  //     const pathname = new URL(url).pathname;
-  //     let filename = pathname.split("/").pop() || "";
-  //     if (filename) {
-  //       filename = filename.replace(/\.[^/.]+$/, "");
-  //       filename = filename.replace(/[-_]/g, " ");
-  //       filename = filename
-  //         .split(" ")
-  //         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-  //         .join(" ");
-  //       if (filename.length > 45) {
-  //         filename = filename.substring(0, 42) + "...";
-  //       }
-  //       return filename;
-  //     }
-  //     return url.length > 45 ? url.substring(0, 42) + "..." : url;
-  //   } catch {
-  //     return url.length > 45 ? url.substring(0, 42) + "..." : url;
-  //   }
-  // };
-
   const renderSourceList = (sources: Source[], title: string) => {
     const docTypes = Array.from(
       new Set(sources?.map((source) => source.doc_type))
@@ -135,7 +114,9 @@ export default function SearchResultsPage() {
           <div className="space-y-4">
             {docTypes.map((docType) => (
               <div key={docType}>
-                <h4 className="font-semibold mb-2 text-[#333333] text-sm">{docType}</h4>
+                <h4 className="font-semibold mb-2 text-[#333333] text-sm">
+                  {docType}
+                </h4>
                 <ul className="space-y-2">
                   {sources
                     .filter((source) => source.doc_type === docType)
@@ -149,10 +130,7 @@ export default function SearchResultsPage() {
                             className="flex items-center gap-2 text-sm text-slate-600 hover:underline"
                           >
                             <Globe className="w-4 h-4 flex-shrink-0" />
-                            {/* <span className="truncate inline-block w-full">
-                              {getFileNameFromUrl(source.url)}
-                            </span> */}
-                                 <span className="truncate">
+                            <span className="truncate">
                               {new URL(source.url).hostname.replace("www.", "")}
                             </span>
                           </a>
@@ -172,26 +150,70 @@ export default function SearchResultsPage() {
     );
   };
 
+  const aiSummaryMarkdown = `
+### Tesla Q3 2024 Financial Highlights
+
+Tesla's Q3 2024 performance showcases strong growth in vehicle deliveries and energy solutions. 
+The company reported $25.7 billion in revenue, reflecting a 12% year-over-year increase, with 
+430,000 vehicles delivered, driven primarily by the Model Y's global success. Despite a slight decline 
+in gross margin to 24.2% due to higher material costs and factory ramp-ups, Tesla maintained 
+profitability with a net income of $2.8 billion.
+
+Key highlights include:
+- 41% surge in Tesla Energy revenue
+- Advancements in 4680 battery cell production
+- Opening of a new Gigafactory in Mexico
+
+Tesla reiterated its delivery target of 1.8 million units for 2024, solidifying its 
+leadership in the EV industry while advancing sustainable energy solutions globally.
+
+## Key Metrics
+
+- **Revenue Growth**: +12% YoY
+- **Vehicles Delivered**: 430,000
+- **Gross Margin**: 24.2%
+- **Net Income**: $2.8B
+
+Explore detailed financial reports and strategic updates below for comprehensive insights into Tesla's Q3 2024 performance.
+  `;
+
+  const renderAiSummary = () => (
+    <Card className="max-w-4xl">
+      <CardHeader className="mb-2 flex flex-row items-center justify-between">
+        <Button
+          variant="ghost"
+          className="hover:bg-transparent p-0 flex items-center gap-2 text-gray-600"
+          onClick={() => setShowAiSummary(false)}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Results
+        </Button>
+      </CardHeader>
+      <CardContent className="h-[calc(100vh-250px)] overflow-y-auto">
+        <ReactMarkdown remarkPlugins={[remarkGfm]} className="prose">
+          {aiSummaryMarkdown}
+        </ReactMarkdown>
+      </CardContent>
+    </Card>
+  );
+
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="container md:mx-auto p-6 max-w-7xl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 mx-5">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 md:mx-5 mt-8 md:mt-2">
         <div className="flex-1 w-full sm:w-auto">
           <h1 className="text-lg mb-4 sm:mb-0">
             Search Result for:{" "}
             <span className="font-medium">{currentQuery}</span>
           </h1>
         </div>
-        <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto justify-end">
+        <div className="flex items-center gap-4 w-full sm:w-auto justify-end">
           <Button
             variant="outline"
             className="flex items-center gap-2 rounded-full bg-white w-full sm:w-auto"
+            onClick={() => setShowAiSummary(true)}
           >
-            <Image
-              src={Stars}
-              alt="stars"
-              className="w-6 h-6 object-contain"
-            ></Image>
+            <Image src={Stars} alt="stars" className="w-6 h-6 object-contain" />
             <span className="bg-custom-gradient bg-clip-text text-transparent">
               AI Summarize
             </span>
@@ -222,7 +244,7 @@ export default function SearchResultsPage() {
         </div>
       ) : searchResults ? (
         <>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 mx-5">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 md:mx-5">
             <div className="lg:col-span-2">
               <div className="border rounded-lg overflow-hidden">
                 <div className="h-[calc(100vh-170px)] overflow-y-auto px-6 py-1 space-y-2 shadow-lg rounded-xl">
@@ -284,17 +306,25 @@ export default function SearchResultsPage() {
               </div>
             </div>
 
-            <div className="space-y-6">
-              {searchResults.valid_sources.length > 0 &&
-                renderSourceList(
-                  searchResults.valid_sources,
-                  "Found Answers From"
-                )}
-              {searchResults.invalid_sources.length > 0 &&
-                renderSourceList(
-                  searchResults.invalid_sources,
-                  "No Answer Found From"
-                )}
+            <div className="space-y-6 w-full lg:col-span-1">
+              {showAiSummary ? (
+                <div className="w-full lg:col-span-2">
+                  {renderAiSummary()}
+                </div>
+              ) : (
+                <>
+                  {searchResults.valid_sources.length > 0 &&
+                    renderSourceList(
+                      searchResults.valid_sources,
+                      "Found Answers From"
+                    )}
+                  {searchResults.invalid_sources.length > 0 &&
+                    renderSourceList(
+                      searchResults.invalid_sources,
+                      "No Answer Found From"
+                    )}
+                </>
+              )}
             </div>
           </div>
 
