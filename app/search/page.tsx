@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { Search, Share2, MoreVertical, Globe, ArrowLeft } from "lucide-react";
+import { Search, Share2, MoreVertical, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ReactMarkdown from "react-markdown";
@@ -10,6 +10,7 @@ import { SearchContext } from "@/app/search-context";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Stars from "../../public/icons/stars.png";
+import { AiSummaryMarkdown } from "@/components/AiSummaryMarkdown";
 
 interface Node {
   content: string;
@@ -38,6 +39,7 @@ export default function SearchResultsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAiSummary, setShowAiSummary] = useState(false);
+  const [selectedContent, setSelectedContent] = useState<Node | null>(null);
 
   const searchQuery = useSearchParams().get("query");
 
@@ -59,7 +61,7 @@ export default function SearchResultsPage() {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/chat`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/search`,
         {
           method: "POST",
           headers: {
@@ -150,52 +152,25 @@ export default function SearchResultsPage() {
     );
   };
 
-  const aiSummaryMarkdown = `
-### Tesla Q3 2024 Financial Highlights
+  const handleAiSummarize = (content: Node) => {
+    setSelectedContent(content);
+    setShowAiSummary(true);
+  };
 
-Tesla's Q3 2024 performance showcases strong growth in vehicle deliveries and energy solutions. 
-The company reported $25.7 billion in revenue, reflecting a 12% year-over-year increase, with 
-430,000 vehicles delivered, driven primarily by the Model Y's global success. Despite a slight decline 
-in gross margin to 24.2% due to higher material costs and factory ramp-ups, Tesla maintained 
-profitability with a net income of $2.8 billion.
+  const renderAiSummary = () => {
+    if (!selectedContent) return null;
 
-Key highlights include:
-- 41% surge in Tesla Energy revenue
-- Advancements in 4680 battery cell production
-- Opening of a new Gigafactory in Mexico
-
-Tesla reiterated its delivery target of 1.8 million units for 2024, solidifying its 
-leadership in the EV industry while advancing sustainable energy solutions globally.
-
-## Key Metrics
-
-- **Revenue Growth**: +12% YoY
-- **Vehicles Delivered**: 430,000
-- **Gross Margin**: 24.2%
-- **Net Income**: $2.8B
-
-Explore detailed financial reports and strategic updates below for comprehensive insights into Tesla's Q3 2024 performance.
-  `;
-
-  const renderAiSummary = () => (
-    <Card className="max-w-4xl">
-      <CardHeader className="mb-2 flex flex-row items-center justify-between">
-        <Button
-          variant="ghost"
-          className="hover:bg-transparent p-0 flex items-center gap-2 text-gray-600"
-          onClick={() => setShowAiSummary(false)}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Results
-        </Button>
-      </CardHeader>
-      <CardContent className="h-[calc(100vh-250px)] overflow-y-auto">
-        <ReactMarkdown remarkPlugins={[remarkGfm]} className="prose">
-          {aiSummaryMarkdown}
-        </ReactMarkdown>
-      </CardContent>
-    </Card>
-  );
+    return (
+      <AiSummaryMarkdown
+        key={`${selectedContent.source}-${Date.now()}`}
+        initialContent={selectedContent.content}
+        onBack={() => setShowAiSummary(false)}
+        nodeId={`${selectedContent.source}-${Date.now()}`}
+        source={selectedContent.source}
+        searchQuery={currentQuery}
+      />
+    );
+  };
 
   return (
     <div className="container md:mx-auto p-6 max-w-7xl">
@@ -208,16 +183,6 @@ Explore detailed financial reports and strategic updates below for comprehensive
           </h1>
         </div>
         <div className="flex items-center gap-4 w-full sm:w-auto justify-end">
-          <Button
-            variant="outline"
-            className="flex items-center gap-2 rounded-full bg-white w-full sm:w-auto"
-            onClick={() => setShowAiSummary(true)}
-          >
-            <Image src={Stars} alt="stars" className="w-6 h-6 object-contain" />
-            <span className="bg-custom-gradient bg-clip-text text-transparent">
-              AI Summarize
-            </span>
-          </Button>
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" className="rounded-full">
               <Search className="h-12 w-12 object-contain" />
@@ -244,7 +209,7 @@ Explore detailed financial reports and strategic updates below for comprehensive
         </div>
       ) : searchResults ? (
         <>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 md:mx-5">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 md:mx-5 max-h-full">
             <div className="lg:col-span-2">
               <div className="border rounded-lg overflow-hidden">
                 <div className="h-[calc(100vh-170px)] overflow-y-auto px-6 py-1 space-y-2 shadow-lg rounded-xl">
@@ -270,8 +235,8 @@ Explore detailed financial reports and strategic updates below for comprehensive
                             {content.content}
                           </ReactMarkdown>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <div className="text-blue-500">
+                        <div className="flex flex-col md:flex-row items-start justify-between md:items-center gap-2">
+                          <div className="text-blue-500 flex items-center">
                             {isValidUrl(content.source) ? (
                               <p className="flex gap-x-1 line-clamp-1 items-center">
                                 <Globe className="w-5 h-5" />
@@ -290,8 +255,24 @@ Explore detailed financial reports and strategic updates below for comprehensive
                               <p>Source not available</p>
                             )}
                           </div>
-                          <div className="mb-6 px-2 py-1 text-purple-500 border-2 border-purple-200 bg-purple-100 rounded-lg transition-colors">
-                            {content.doc_type}
+                          <div className="flex flex-col md:flex-row gap-3 md:items-center">
+                            <div className="text-center px-2 py-1 text-purple-500 border-2 border-purple-200 bg-purple-100 rounded-lg transition-colors">
+                              {content.doc_type}
+                            </div>
+                            <Button
+                              variant="outline"
+                              className="flex items-center gap-2 rounded-full bg-white w-full sm:w-auto"
+                              onClick={() => handleAiSummarize(content)}
+                            >
+                              <Image
+                                src={Stars}
+                                alt="stars"
+                                className="w-6 h-6 object-contain"
+                              />
+                              <span className="bg-custom-gradient bg-clip-text text-transparent">
+                                AI Summarize
+                              </span>
+                            </Button>
                           </div>
                         </div>
                         {index < searchResults.response.length - 1 && (
@@ -306,9 +287,9 @@ Explore detailed financial reports and strategic updates below for comprehensive
               </div>
             </div>
 
-            <div className="space-y-6 w-full lg:col-span-1">
+            <div className="space-y-6 w-full lg:col-span-1 h-full">
               {showAiSummary ? (
-                <div className="w-full lg:col-span-2">
+                <div className="h-full w-full lg:col-span-2">
                   {renderAiSummary()}
                 </div>
               ) : (
