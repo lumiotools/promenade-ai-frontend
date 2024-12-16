@@ -49,10 +49,12 @@ export interface CompanyData {
     month: string;
     category: {
       name: string;
-      color: string;
+      textColor: string;
+      bgColor:string
     };
     source: string;
     title: string;
+    randomText: string;
   }>;
   keyPeople: Array<{
     name: string;
@@ -173,54 +175,64 @@ export async function fetchCompanyData(): Promise<CompanyData> {
         month: "11/Jun/2024",
         category: {
           name: "Product & Services",
-          color: "text-green-600",
+          textColor: "text-green-700",
+          bgColor:"bg-[#ECFDF3]",
         },
         source: "New York Times",
         title:
           "L'Oréal launches new sustainable beauty line - The Financial Express",
+        randomText: "Exciting new product launch!",
       },
       {
         date: "2024,05",
         month: "11/May/2024",
         category: {
           name: "Financing & Investment",
-          color: "text-blue-500",
+          textColor: "text-gray-800",
+          bgColor: "bg-[#D1FAE5]",
         },
         source: "New York Times",
         title:
           "L'Oréal invests in beauty tech startup for personalized skincare",
+        randomText: "Investment in innovation!",
       },
       {
         date: "2024,04",
         month: "11/Apr/2024",
         category: {
           name: "Corporate Strategy",
-          color: "text-purple-600",
+          textColor: "text-purple-800",
+          bgColor: "bg-[#E0C3FC]",
         },
         source: "New York Times",
         title:
           "L'Oréal expands presence in emerging markets with new acquisition",
+        randomText: "Strategic growth initiative!",
       },
       {
         date: "2024,03",
         month: "11/Mar/2024",
         category: {
           name: "Corporate Social Responsibilities",
-          color: "text-pink-600",
+          textColor: "text-pink-800",
+          bgColor: "bg-[#FBCFE8]",
         },
         source: "New York Times",
         title: "L'Oréal pledges to achieve carbon neutrality by 2025",
+        randomText: "Commitment to sustainability!",
       },
       {
         date: "2023,11",
         month: "11/Nov/2023",
         category: {
           name: "Financial Performance",
-          color: "text-blue-600",
+          textColor: "text-blue-800",
+          bgColor: "bg-[#BFDBFE]",
         },
         source: "New York Times",
         title:
           "L'Oréal reports strong Q3 results, driven by luxury and active cosmetics divisions",
+        randomText: "Strong financial results!",
       },
     ],
     keyPeople: [

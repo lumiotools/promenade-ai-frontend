@@ -2,7 +2,7 @@ import { Mail, Coins } from "lucide-react";
 
 export function TopNav() {
   return (
-    <div className="flex items-center justify-end gap-4 px-4 py-2 border-b">
+    <div className="flex flex-col md:flex-row items-start md:items-center justify-end gap-4 px-4 py-2 border-b">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <Mail className="h-4 w-4" />
         <span>customer@promenade-ai.com</span>
