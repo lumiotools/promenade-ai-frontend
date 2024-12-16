@@ -11,26 +11,33 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import ShareIcon from "../public/icons/share.png";
 import Excel from "../public/icons/Excel.png";
+import { CompanyData } from "../lib/dummyApi";
 
-export function CompanyHeader() {
+interface CompanyHeaderProps {
+  companyData: CompanyData;
+}
+
+export function CompanyHeader({ companyData }: CompanyHeaderProps) {
   return (
     <div className="space-y-8 p-6">
       <div className="space-y-4">
         <h1 className="text-2xl font-semibold">
-          Finding Tear-sheet for Google
+          Finding Tear-sheet for {companyData.name}
         </h1>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Calendar className="h-4 w-4 text-[#1F2A37]" />
-              <span className="text-xs text-[#1F2A37]">As of 20 May 2024</span>
+              <span className="text-xs text-[#1F2A37]">
+                As of {new Date().toLocaleDateString()}
+              </span>
             </div>
             <div className="h-5 border-l w-1 border-[#D2D6DB]"></div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-black">Search Criteria:</span>
               <span className="bg-[#E5E7EB] text-sm px-2 py-1 rounded-xl">
-                www.matracon.com
+                www.{companyData.name.toLowerCase()}.com
               </span>
             </div>
           </div>
@@ -76,8 +83,8 @@ export function CompanyHeader() {
 
       <div className="bg-white rounded-lg p-6 flex items-start gap-6">
         <Image
-          src="/images/test-company-logo.png"
-          alt="Matracon"
+          src={companyData.logo}
+          alt={companyData.name}
           width={96}
           height={96}
           className="rounded-lg object-contain"
@@ -86,9 +93,9 @@ export function CompanyHeader() {
         <div className="flex-1">
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h2 className="text-xl font-semibold mb-1">Matracon</h2>
+              <h2 className="text-xl font-semibold mb-1">{companyData.name}</h2>
               <p className="text-[#344054] text-xs">
-                Provider of platform for on-demand distributed manufacturing
+                {companyData.description}
               </p>
             </div>
             <div className="flex gap-2">
@@ -128,37 +135,47 @@ export function CompanyHeader() {
               <div className="grid grid-cols-3 gap-y-6">
                 <div>
                   <div className="text-[11px] text-muted-foreground">Type</div>
-                  <div className="font-medium text-xs">Public</div>
+                  <div className="font-medium text-xs">{companyData.type}</div>
                 </div>
                 <div>
                   <div className="text-[11px] text-muted-foreground">
                     No. of Employees
                   </div>
-                  <div className="font-medium text-xs">10,000</div>
+                  <div className="font-medium text-xs">
+                    {companyData.employees}
+                  </div>
                 </div>
                 <div>
                   <div className="text-[11px] text-muted-foreground">
                     Incorporation Year
                   </div>
-                  <div className="font-medium text-xs">2004</div>
+                  <div className="font-medium text-xs">
+                    {companyData.incorporationYear}
+                  </div>
                 </div>
                 <div>
                   <div className="text-[11px] text-muted-foreground">
                     Annual Revenue
                   </div>
-                  <div className="font-medium text-xs">$20M</div>
+                  <div className="font-medium text-xs">
+                    {companyData.annualRevenue}
+                  </div>
                 </div>
                 <div>
                   <div className="text-[11px] text-muted-foreground">
                     Funding
                   </div>
-                  <div className="font-medium text-xs">$10M (Seed A)</div>
+                  <div className="font-medium text-xs">
+                    {companyData.funding}
+                  </div>
                 </div>
                 <div>
                   <div className="text-[11px] text-muted-foreground">
                     Category
                   </div>
-                  <div className="font-medium text-xs">Fashion, eCommerce</div>
+                  <div className="font-medium text-xs">
+                    {companyData.category}
+                  </div>
                 </div>
               </div>
             </div>
@@ -169,23 +186,31 @@ export function CompanyHeader() {
                   <div className="text-[11px] text-muted-foreground">
                     CEO First Name
                   </div>
-                  <div className="font-medium text-xs">Sylvia</div>
+                  <div className="font-medium text-xs">
+                    {companyData.ceo.firstName}
+                  </div>
                 </div>
                 <div>
                   <div className="text-[11px] text-muted-foreground">
                     CEO Last Name
                   </div>
-                  <div className="font-medium text-xs">Woo</div>
+                  <div className="font-medium text-xs">
+                    {companyData.ceo.lastName}
+                  </div>
                 </div>
                 <div>
                   <div className="text-[11px] text-muted-foreground">Email</div>
-                  <div className="font-medium text-xs">Sylviawoo@gmail.com</div>
+                  <div className="font-medium text-xs">
+                    {companyData.ceo.email}
+                  </div>
                 </div>
                 <div>
                   <div className="text-[11px] text-muted-foreground">
                     LinkedIn
                   </div>
-                  <div className="font-medium text-xs">www.Linkedin.com</div>
+                  <div className="font-medium text-xs">
+                    {companyData.ceo.linkedin}
+                  </div>
                 </div>
               </div>
             </div>

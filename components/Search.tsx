@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { SearchResult } from "@/types/search";
 import Image from "next/image";
 import ValueChain from "../public/icons/value-chain.png";
-import Birdeye from "../public/icons/Birdeye.png"
+import Birdeye from "../public/icons/birdeye.png"
 import { CompanyProfileModal } from "../components/CompanyProfileModal";
 import { MarketingTrendsModal } from "../components/MarketingTrendsModal";
 import { ValueChainModal } from "../components/ValueChainModal";

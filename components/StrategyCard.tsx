@@ -1,14 +1,13 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import Image, { StaticImageData } from "next/image";
+import Image from "next/image";
+import { CompanyData } from "@/lib/dummyApi";
 
 interface StrategyCardProps {
-  sources: Array<{
-    id: string;
-    source: StaticImageData;
-  }>;
+  sources: CompanyData["sources_StrategyCard"][keyof CompanyData["sources_StrategyCard"]][];
+  strategy: CompanyData["strategy"];
 }
 
-export function StrategyCard({ sources }: StrategyCardProps) {
+export function StrategyCard({ sources, strategy }: StrategyCardProps) {
   return (
     <Card className="bg-white mx-6 mt-5">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 border-b">
@@ -20,7 +19,7 @@ export function StrategyCard({ sources }: StrategyCardProps) {
               <Image
                 key={source.id}
                 src={source.source}
-                alt={source.id}
+                alt={source.name}
                 width={20}
                 height={20}
                 className="rounded-full"
@@ -39,15 +38,13 @@ export function StrategyCard({ sources }: StrategyCardProps) {
               <li>
                 <span className="font-semibold">Digital Focus:</span>{" "}
                 <span className="text-sm text-muted-foreground">
-                  Significant investments in e-commerce and digital platforms,
-                  resulting in robust online sales growth.
+                  {strategy.recentStrategy.digitalFocus}
                 </span>
               </li>
               <li>
                 <span className="font-semibold">Sustainability Efforts:</span>{" "}
                 <span className="text-sm text-muted-foreground">
-                  Increased investment in sustainable practices and eco-friendly
-                  product lines.
+                  {strategy.recentStrategy.sustainabilityEfforts}
                 </span>
               </li>
               <li>
@@ -55,23 +52,19 @@ export function StrategyCard({ sources }: StrategyCardProps) {
                   Luxury and Professional Segments:
                 </span>{" "}
                 <span className="text-sm text-muted-foreground">
-                  Luxury and Professional Segments: Strong performance in luxury
-                  cosmetics and professional haircare sectors, driving overall
-                  revenue growth.
+                  {strategy.recentStrategy.luxuryAndProfessionalSegments}
                 </span>
               </li>
               <li>
                 <span className="font-semibold">Innovation:</span>{" "}
                 <span className="text-sm text-muted-foreground">
-                  Continuous focus on research and development, introducing new,
-                  innovative beauty products to the market.
+                  {strategy.recentStrategy.innovation}
                 </span>
               </li>
               <li>
                 <span className="font-semibold">Financial Performance:</span>{" "}
                 <span className="text-sm text-muted-foreground">
-                  Achieved solid financial results in 2022, reflecting
-                  successful strategic initiatives.
+                  {strategy.recentStrategy.financialPerformance}
                 </span>
               </li>
             </ul>
@@ -85,36 +78,31 @@ export function StrategyCard({ sources }: StrategyCardProps) {
               <li>
                 <span className="font-semibold">Digital Transformation:</span>{" "}
                 <span className="text-sm text-muted-foreground">
-                  Achieved solid financial results in 2022, reflecting
-                  successful strategic initiatives.
+                  {strategy.strategicFocus.digitalTransformation}
                 </span>
               </li>
               <li>
                 <span className="font-semibold">Emerging Markets:</span>{" "}
                 <span className="text-sm text-muted-foreground">
-                  Strengthen presence and expand operations in emerging
-                  economies.
+                  {strategy.strategicFocus.emergingMarkets}
                 </span>
               </li>
               <li>
                 <span className="font-semibold">Sustainability:</span>{" "}
                 <span className="text-sm text-muted-foreground">
-                  Maintain commitment to sustainability through eco-friendly
-                  products and practices.
+                  {strategy.strategicFocus.sustainability}
                 </span>
               </li>
               <li>
                 <span className="font-semibold">Innovation:</span>{" "}
                 <span className="text-sm text-muted-foreground">
-                  Continue investment in R&D for cutting-edge beauty
-                  technologies.
+                  {strategy.strategicFocus.innovation}
                 </span>
               </li>
               <li>
                 <span className="font-semibold">Consumer Engagement:</span>{" "}
                 <span className="text-sm text-muted-foreground">
-                  Enhance direct-to-consumer channels to improve customer
-                  experience and personalization.
+                  {strategy.strategicFocus.consumerEngagement}
                 </span>
               </li>
             </ul>

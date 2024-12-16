@@ -1,18 +1,10 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, Linkedin } from "lucide-react";
-import Image from "next/image";
-
-interface Person {
-  name: string;
-  title: string;
-  description: string;
-  email: string;
-  linkedin: string;
-}
+import { CompanyData } from "../lib//dummyApi";
 
 interface KeyPeopleProps {
-  people: Person[];
+  people: CompanyData["keyPeople"];
 }
 
 export function KeyPeople({ people }: KeyPeopleProps) {

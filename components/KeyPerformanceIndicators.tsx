@@ -1,18 +1,15 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import Image from "next/image";
-
-interface Source {
-  id: string;
-  name: string;
-  source: any;
-}
+import { CompanyData } from "@/lib/dummyApi";
 
 interface KeyPerformanceIndicatorsProps {
-  sources: Source[];
+  sources: CompanyData["sources_KeyPerformanceIndicators"][keyof CompanyData["sources_KeyPerformanceIndicators"]][];
+  kpi: CompanyData["kpi"];
 }
 
 export function KeyPerformanceIndicators({
   sources,
+  kpi,
 }: KeyPerformanceIndicatorsProps) {
   return (
     <Card className="bg-white mx-6 mt-5">
@@ -42,106 +39,12 @@ export function KeyPerformanceIndicators({
       </CardHeader>
       <CardContent className="pt-6">
         <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              Product A - description
-            </span>
-            <span className="font-medium">$ 40.86 Mn</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">Profit Margin</span>
-            <span className="font-medium">$ 40.86 Mn</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              Enterprise Value
-            </span>
-            <span className="font-medium">$ 54.09 Mn</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              Return on Assets (ttm)
-            </span>
-            <span className="font-medium">$ 54.09 Mn</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">Trailing P/E</span>
-            <span className="font-medium">13.6 Mn</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              Return on Equity (ttm)
-            </span>
-            <span className="font-medium">13.6 Mn</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">Forward P/E</span>
-            <span className="font-medium">1.6%</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">Revenue (ttm)</span>
-            <span className="font-medium">1.02 %</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              PEG Ratio (5yr expected)
-            </span>
-            <span className="font-medium">1.5%</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              Net Income Avi to Common (ttm)
-            </span>
-            <span className="font-medium">1.5%</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              Price/Sales (ttm)
-            </span>
-            <span className="font-medium">6.8%</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              Price/Sales (ttm)
-            </span>
-            <span className="font-medium">1.73%</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              Price/Book (mrq)
-            </span>
-            <span className="font-medium">1.02 %</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              Price/Book (mrq)
-            </span>
-            <span className="font-medium">2.5%</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              Enterprise Value/Revenue
-            </span>
-            <span className="font-medium">1.73%</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              Enterprise Value/Revenue
-            </span>
-            <span className="font-medium">1.6%</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              Enterprise Value/EBITDA
-            </span>
-            <span className="font-medium">2.5%</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-sm text-muted-foreground">
-              Enterprise Value/EBITDA
-            </span>
-            <span className="font-medium">6.8%</span>
-          </div>
+          {Object.entries(kpi).map(([key, value]) => (
+            <div key={key} className="flex justify-between">
+              <span className="text-sm text-muted-foreground">{key}</span>
+              <span className="font-medium text-sm">{value}</span>
+            </div>
+          ))}
         </div>
       </CardContent>
     </Card>

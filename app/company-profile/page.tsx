@@ -1,51 +1,58 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { TopNav } from "@/components/TopNav";
 import { CompanyHeader } from "@/components/CompanyHeader";
-import { InfoGrid, sources } from "@/components/company-info-grid";
 import { StrategyCard } from "@/components/StrategyCard";
 import { KeyPerformanceIndicators } from "@/components/KeyPerformanceIndicators";
 import { LatestActivities } from "@/components/LatestActivities";
 import { KeyPeople } from "@/components/KeyPeople";
+import { fetchCompanyData, CompanyData } from "@/lib/dummyApi";
+import { InfoGrid } from "@/components/company-info-grid";
 
-const people = [
-  {
-    name: "John Doe",
-    title: "CEO & CO-Founder",
-    description:
-      "CEO Matracon, ex-Co-Founder ClidBlue Technologies, Office Tiger",
-    email: "john@example.com",
-    linkedin: "https://linkedin.com/in/johndoe",
-  },
-  {
-    name: "John Doe",
-    title: "CEO & CO-Founder",
-    description:
-      "CEO Matracon, ex-Co-Founder ClidBlue Technologies, Office Tiger",
-    email: "john@example.com",
-    linkedin: "https://linkedin.com/in/johndoe",
-  },
-  {
-    name: "John Doe",
-    title: "CEO & CO-Founder",
-    description:
-      "CEO Matracon, ex-Co-Founder ClidBlue Technologies, Office Tiger",
-    email: "john@example.com",
-    linkedin: "https://linkedin.com/in/johndoe",
-  },
-];
+export default function CompanyProfile() {
+  const [companyData, setCompanyData] = useState<CompanyData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-export default function Home() {
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const data = await fetchCompanyData();
+        setCompanyData(data);
+      } catch (error) {
+        console.error("Failed to fetch company data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!companyData) {
+    return <div>Failed to load company data.</div>;
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="min-h-screen bg-[#F9FAFB] w-full">
         <TopNav />
-        <CompanyHeader />
-        <InfoGrid />
-        <StrategyCard sources={Object.values(sources)} />
-        <KeyPerformanceIndicators sources={Object.values(sources)} />
-        <LatestActivities />
-        <KeyPeople people={people} />
+        <CompanyHeader companyData={companyData} />
+        <InfoGrid companyData={companyData} />
+        <StrategyCard
+          sources={Object.values(companyData.sources_StrategyCard)}
+          strategy={companyData.strategy}
+        />
+        <KeyPerformanceIndicators
+          sources={Object.values(companyData.sources_KeyPerformanceIndicators)}
+          kpi={companyData.kpi}
+        />
+        <LatestActivities activities={companyData.activities} />
+        <KeyPeople people={companyData.keyPeople} />
       </div>
     </div>
   );

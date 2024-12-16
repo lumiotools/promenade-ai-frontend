@@ -1,72 +1,12 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { CompanyData } from "../lib/dummyApi";
 
-interface Activity {
-  date: string;
-  month: string;
-  category: {
-    name: string;
-    color: string;
-  };
-  source: string;
-  title: string;
+interface LatestActivitiesProps {
+  activities: CompanyData["activities"];
 }
 
-const activities: Activity[] = [
-  {
-    date: "2024,06",
-    month: "11/Jun/2024",
-    category: {
-      name: "Product & Services",
-      color: "text-green-600",
-    },
-    source: "New York Times",
-    title:
-      "Apple sees a rise in PC shipments, says report - The Financial Express",
-  },
-  {
-    date: "2024,05",
-    month: "11/Jun/2024",
-    category: {
-      name: "Financing & Investment",
-      color: "text-blue-500",
-    },
-    source: "New York Times",
-    title: "Exploring Google's Latest Milestone in Acknowledgment Tech",
-  },
-  {
-    date: "2024,04",
-    month: "11/Jun/2024",
-    category: {
-      name: "Corporate Strategy",
-      color: "text-purple-600",
-    },
-    source: "New York Times",
-    title: "Breaking Down Google's Innovative Acknowledgment Launch",
-  },
-  {
-    date: "2024,03",
-    month: "11/Jun/2024",
-    category: {
-      name: "Corporate Social Responsibilities",
-      color: "text-pink-600",
-    },
-    source: "New York Times",
-    title: "evolutionizing Recognition: Inside Google's Mega Acknowledgment",
-  },
-  {
-    date: "2023,11",
-    month: "11/Jun/2024",
-    category: {
-      name: "Financial Performance",
-      color: "text-blue-600",
-    },
-    source: "New York Times",
-    title: "How Google's New Acknowledgment Feature Will Impact Us",
-  },
-];
-
-export function LatestActivities() {
+export function LatestActivities({ activities }: LatestActivitiesProps) {
   return (
     <Card className="bg-white mt-5 mx-6">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
