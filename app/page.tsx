@@ -2,7 +2,7 @@
 
 import { useContext } from "react";
 import { SearchContext } from "@/app/search-context";
-import SearchPage from "@/components/Search";
+import  SearchPage from "@/components/Search";
 
 export default function Home() {
   const { currentQuery, setCurrentQuery, addSearch } =

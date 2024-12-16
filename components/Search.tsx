@@ -4,15 +4,15 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SearchIcon, Loader2, Eye, Telescope, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SearchResult } from "@/types/search";
 import Image from "next/image";
 import ValueChain from "../public/icons/value-chain.png";
-import Birdeye from "../public/icons/birdeye.png"
+import Birdeye from "../public/icons/birdeye.png";
 import { CompanyProfileModal } from "../components/CompanyProfileModal";
 import { MarketingTrendsModal } from "../components/MarketingTrendsModal";
 import { ValueChainModal } from "../components/ValueChainModal";
 import { MarketingMapModal } from "../components/MarketingMapModal";
 import { LoadingCard } from "../components/LoadingCard";
+import { SearchResult } from "@/types/search";
 
 interface SearchPageProps {
   currentQuery: string;
@@ -27,13 +27,10 @@ export default function SearchPage({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchMode, setSearchMode] = useState<"sec" | "all" | "upload">("sec");
-  const [activeModal, setActiveModal] = useState<string | null>(null);
+  const [activeModal, setActiveModal] = useState<
+    "companyProfile" | "marketingTrends" | "valueChain" | "marketingMap" | null
+  >(null);
   const router = useRouter();
-
-  const handleCompanyProfileSearch = () => {
-    setIsLoading(false);
-    router.push("/company-profile");
-  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,8 +45,28 @@ export default function SearchPage({
   const handleModalSubmit = async () => {
     setIsLoading(true);
     setActiveModal(null);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    setIsLoading(false);
+    try {
+      router.push("/company-profile");
+    } catch (error) {
+      console.error("Error submitting company profile:", error);
+      setError("Failed to submit company profile. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOpenModal = (
+    modalType:
+      | "companyProfile"
+      | "marketingTrends"
+      | "valueChain"
+      | "marketingMap"
+  ) => {
+    setActiveModal(modalType);
+  };
+
+  const handleCloseModal = () => {
+    setActiveModal(null);
   };
 
   return (
@@ -146,7 +163,7 @@ export default function SearchPage({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div
               className="p-6 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors"
-              onClick={() => setActiveModal("marketingTrends")}
+              onClick={() => handleOpenModal("marketingTrends")}
             >
               <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
                 <Telescope className="w-5 h-5" />
@@ -158,7 +175,7 @@ export default function SearchPage({
             </div>
             <div
               className="p-6 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors"
-              onClick={() => setActiveModal("companyProfile")}
+              onClick={() => handleOpenModal("companyProfile")}
             >
               <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
                 <Building2 className="w-5 h-5" />
@@ -170,7 +187,7 @@ export default function SearchPage({
             </div>
             <div
               className="p-6 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors"
-              onClick={() => setActiveModal("valueChain")}
+              onClick={() => handleOpenModal("valueChain")}
             >
               <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
                 <Image src={ValueChain} alt="Value Chain" className="w-5 h-5" />
@@ -182,7 +199,7 @@ export default function SearchPage({
             </div>
             <div
               className="p-6 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors"
-              onClick={() => setActiveModal("marketingMap")}
+              onClick={() => handleOpenModal("marketingMap")}
             >
               <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
                 <Image src={Birdeye} alt="Marketing Map" className="w-5 h-5" />
@@ -207,28 +224,28 @@ export default function SearchPage({
           {activeModal === "marketingTrends" && (
             <MarketingTrendsModal
               isOpen={true}
-              onClose={() => setActiveModal(null)}
+              onClose={handleCloseModal}
               onSubmit={handleModalSubmit}
             />
           )}
           {activeModal === "companyProfile" && (
             <CompanyProfileModal
               isOpen={true}
-              onClose={() => setActiveModal(null)}
+              onClose={handleCloseModal}
               onSubmit={handleModalSubmit}
             />
           )}
           {activeModal === "valueChain" && (
             <ValueChainModal
               isOpen={true}
-              onClose={() => setActiveModal(null)}
+              onClose={handleCloseModal}
               onSubmit={handleModalSubmit}
             />
           )}
           {activeModal === "marketingMap" && (
             <MarketingMapModal
               isOpen={true}
-              onClose={() => setActiveModal(null)}
+              onClose={handleCloseModal}
               onSubmit={handleModalSubmit}
             />
           )}
@@ -239,7 +256,7 @@ export default function SearchPage({
         <div className="absolute inset-0 flex items-center justify-center">
           <LoadingCard
             companyName="Nvidia"
-            onBack={handleCompanyProfileSearch}
+            onBack={() => setIsLoading(false)}
           />
         </div>
       )}
