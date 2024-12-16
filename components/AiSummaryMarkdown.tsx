@@ -32,6 +32,8 @@ export function AiSummaryMarkdown({
     Array<{ role: string; content: string }>
   >([]);
 
+  console.log(summary)
+
   useEffect(() => {
     fetchInitialSummary();
   }, [initialContent, nodeId, searchQuery]);
