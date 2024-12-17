@@ -16,6 +16,10 @@ const config: Config = {
   				}
   			}
   		},
+		backgroundImage: {
+			'custom-gradient':
+			  'linear-gradient(299.73deg, #B689FF 18.18%, #00EC9D 100.4%, #B588FE 210.75%, #D3FF95 297.18%)',
+		},
   		colors: {
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
