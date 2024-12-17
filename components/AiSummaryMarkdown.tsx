@@ -141,7 +141,7 @@ export function AiSummaryMarkdown({
           ? data.content
           : typeof data === "string"
           ? data
-          : JSON.stringify(data.response);
+          : data.response;
 
       setSummary(assistantContent);
       setChatHistory([
