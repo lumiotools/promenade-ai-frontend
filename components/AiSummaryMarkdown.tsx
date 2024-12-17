@@ -124,7 +124,7 @@ export function AiSummaryMarkdown({
               doc_type: "",
             },
             search_query: searchQuery,
-            chat_history: updatedChatHistory,
+            chat_history: chatHistory,
             message: input,
           }),
         }
