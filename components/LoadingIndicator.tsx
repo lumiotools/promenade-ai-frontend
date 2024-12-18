@@ -27,7 +27,7 @@ function useLoadingIndicator() {
         }
         return prevIndex; // Stay on the last log
       });
-    }, Math.random() * (30000 - 15000) + 15000); // Random interval between 15-30 seconds
+    }, Math.random() * (10000 - 5000) + 5000); // Random interval between 5-10 seconds
 
     const ellipsisInterval = setInterval(() => {
       setEllipsis((prev) => {
