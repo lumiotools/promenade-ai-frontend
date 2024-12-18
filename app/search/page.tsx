@@ -15,12 +15,14 @@ import { AiSummaryMarkdown } from "@/components/AiSummaryMarkdown";
 
 interface Node {
   content: string;
+  title: string;
   source: string;
   doc_type: string;
 }
 
 interface Source {
   doc_type: string;
+  title: string;
   url: string;
 }
 
@@ -134,7 +136,7 @@ export default function SearchResultsPage() {
                           >
                             <Globe className="w-4 h-4 flex-shrink-0" />
                             <span className="truncate">
-                              {new URL(source.url).hostname.replace("www.", "")}
+                              {source.title}
                             </span>
                           </a>
                         </li>
@@ -232,13 +234,18 @@ export default function SearchResultsPage() {
                                   {props.children}
                                 </a>
                               ),
+                              mark: (props) => (
+                                <mark className="bg-yellow-300">
+                                  {props.children}
+                                </mark>
+                              ),
                             }}
                           >
                             {content.content}
                           </ReactMarkdown>
                         </div>
                         <div className="flex flex-col md:flex-row items-start justify-between md:items-center gap-2">
-                          <div className="text-blue-500 flex items-center">
+                          <div className="text-blue-500 flex items-center w-1/2">
                             {isValidUrl(content.source) ? (
                               <p className="flex gap-x-1 line-clamp-1 items-center">
                                 <Globe className="w-5 h-5" />
@@ -246,11 +253,9 @@ export default function SearchResultsPage() {
                                   href={content.source}
                                   target="_blank"
                                   rel="noreferrer"
+                                  className="truncate flex-1"
                                 >
-                                  {new URL(content.source).hostname.replace(
-                                    "www.",
-                                    ""
-                                  )}
+                                  {content.title}
                                 </a>
                               </p>
                             ) : (
