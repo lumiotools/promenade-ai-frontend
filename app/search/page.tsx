@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import rehypeRaw from "rehype-raw"
+import rehypeRaw from "rehype-raw";
 import { SearchContext } from "@/app/search-context";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Stars from "../../public/icons/stars.png";
 import { AiSummaryMarkdown } from "@/components/AiSummaryMarkdown";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface Node {
   content: string;
@@ -135,9 +136,7 @@ export default function SearchResultsPage() {
                             className="flex items-center gap-2 text-sm text-slate-600 hover:underline"
                           >
                             <Globe className="w-4 h-4 flex-shrink-0" />
-                            <span className="truncate">
-                              {source.title}
-                            </span>
+                            <span className="truncate">{source.title}</span>
                           </a>
                         </li>
                       ) : (
@@ -207,9 +206,7 @@ export default function SearchResultsPage() {
       )}
 
       {isLoading ? (
-        <div className="text-center mt-8">
-          <p className="text-xl text-gray-600">Loading...</p>
-        </div>
+        <LoadingIndicator />
       ) : searchResults ? (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 md:mx-5 max-h-full">
