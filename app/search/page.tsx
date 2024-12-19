@@ -6,21 +6,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import rehypeRaw from "rehype-raw"
+import rehypeRaw from "rehype-raw";
 import { SearchContext } from "@/app/search-context";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Stars from "../../public/icons/stars.png";
 import { AiSummaryMarkdown } from "@/components/AiSummaryMarkdown";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
 
 interface Node {
   content: string;
+  title: string;
   source: string;
   doc_type: string;
 }
 
 interface Source {
   doc_type: string;
+  title: string;
   url: string;
 }
 
@@ -133,9 +136,7 @@ export default function SearchResultsPage() {
                             className="flex items-center gap-2 text-sm text-slate-600 hover:underline"
                           >
                             <Globe className="w-4 h-4 flex-shrink-0" />
-                            <span className="truncate">
-                              {new URL(source.url).hostname.replace("www.", "")}
-                            </span>
+                            <span className="truncate">{source.title}</span>
                           </a>
                         </li>
                       ) : (
@@ -205,9 +206,7 @@ export default function SearchResultsPage() {
       )}
 
       {isLoading ? (
-        <div className="text-center mt-8">
-          <p className="text-xl text-gray-600">Loading...</p>
-        </div>
+        <LoadingIndicator />
       ) : searchResults ? (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 md:mx-5 max-h-full">
@@ -232,13 +231,18 @@ export default function SearchResultsPage() {
                                   {props.children}
                                 </a>
                               ),
+                              mark: (props) => (
+                                <mark className="bg-yellow-300">
+                                  {props.children}
+                                </mark>
+                              ),
                             }}
                           >
                             {content.content}
                           </ReactMarkdown>
                         </div>
                         <div className="flex flex-col md:flex-row items-start justify-between md:items-center gap-2">
-                          <div className="text-blue-500 flex items-center">
+                          <div className="text-blue-500 flex items-center w-1/2">
                             {isValidUrl(content.source) ? (
                               <p className="flex gap-x-1 line-clamp-1 items-center">
                                 <Globe className="w-5 h-5" />
@@ -246,11 +250,9 @@ export default function SearchResultsPage() {
                                   href={content.source}
                                   target="_blank"
                                   rel="noreferrer"
+                                  className="truncate flex-1"
                                 >
-                                  {new URL(content.source).hostname.replace(
-                                    "www.",
-                                    ""
-                                  )}
+                                  {content.title}
                                 </a>
                               </p>
                             ) : (
