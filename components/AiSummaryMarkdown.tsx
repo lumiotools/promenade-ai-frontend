@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft, Send } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { AiThinkingLoader } from "./AiThinkingLoader";
 
 interface AiSummaryMarkdownProps {
   initialContent: string;
@@ -32,9 +31,10 @@ export function AiSummaryMarkdown({
     Array<{ role: string; content: string }>
   >([]);
 
+  console.log(error);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  console.log(summary)
+  console.log(summary);
 
   useEffect(() => {
     fetchInitialSummary();
@@ -72,7 +72,7 @@ export function AiSummaryMarkdown({
 
       const data = await response.json();
 
-      const assistantContent = data.response
+      const assistantContent = data.response;
 
       setSummary(assistantContent);
       setChatHistory([
@@ -163,13 +163,14 @@ export function AiSummaryMarkdown({
 
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
-  },[chatHistory])
+  }, [chatHistory]);
 
   return (
-    <Card className="max-w-4xl w-full">
-      <CardHeader className="mb-2 flex flex-row items-center justify-between">
+    <Card className="w-full">
+      <CardHeader className="mb-2 flex flex-col items-start justify-between">
         <Button
           variant="ghost"
           className="hover:bg-transparent p-0 flex items-center gap-2 text-gray-600"
@@ -178,51 +179,54 @@ export function AiSummaryMarkdown({
           <ArrowLeft className="w-4 h-4" />
           Back to Results
         </Button>
+        <h2 className="text-lg font-semibold mb-4">Search Results Summary</h2>
       </CardHeader>
       <CardContent className="space-y-4">
-        {isLoading ? (
-          <AiThinkingLoader />
-        ) : error ? (
-          <div className="text-center text-red-500">{error}</div>
-        ) : (
-          <>
-            <div className="h-[calc(100vh-350px)] overflow-y-auto" ref={chatContainerRef}>
-              {chatHistory.map((message, index) => (
-                <div
-                  key={index}
-                  className={`mb-4 ${
-                    message.role === "user" ? "text-right" : "text-left"
-                  }`}
+        <div
+          className="h-[calc(100vh-350px)] overflow-y-auto"
+          ref={chatContainerRef}
+        >
+          {chatHistory.map((message, index) => (
+            <div
+              key={index}
+              className={`mb-4 ${
+                message.role === "user" ? "text-right" : "text-left"
+              }`}
+            >
+              <div
+                className={`inline-block p-2 rounded-lg ${
+                  message.role === "user" ? "bg-blue-100" : "bg-gray-100 mr-2"
+                }`}
+              >
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  className="prose w-full"
                 >
-                  <div
-                    className={`inline-block p-2 rounded-lg ${
-                      message.role === "user" ? "bg-blue-100" : "bg-gray-100 mr-2"
-                    }`}
-                  >
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                      className="prose w-full"
-                    >
-                      {message.content}
-                    </ReactMarkdown>
-                  </div>
-                </div>
-              ))}
+                  {message.content}
+                </ReactMarkdown>
+              </div>
             </div>
-            <form onSubmit={handleSubmit} className="flex items-center gap-2">
-              <Input
-                type="text"
-                placeholder="Ask a question..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                className="flex-grow"
-              />
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Sending..." : <Send className="w-4 h-4" />}
-              </Button>
-            </form>
-          </>
-        )}
+          ))}
+          {isLoading && (
+            <div className="mb-4 text-left">
+              <div className="inline-block p-2 rounded-lg bg-gray-100 mr-2">
+                AI is thinking...
+              </div>
+            </div>
+          )}
+        </div>
+        <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <Input
+            type="text"
+            placeholder="Ask a question..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            className="flex-grow outline-none"
+          />
+          <Button type="submit" disabled={isLoading}>
+            <Send className="w-4 h-4" />
+          </Button>
+        </form>
       </CardContent>
     </Card>
   );

@@ -1,24 +1,25 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { Search, Share2, MoreVertical, Globe } from "lucide-react";
+import { Globe, SearchIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeRaw from "rehype-raw";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { SearchContext } from "@/app/search-context";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Stars from "../../public/icons/stars.png";
-import { AiSummaryMarkdown } from "@/components/AiSummaryMarkdown";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
+import { CardTitle } from "../ui/card";
+import { AiSummaryMarkdown } from "@/components/AiSummaryMarkdown";
 
 interface Node {
   content: string;
   title: string;
   source: string;
   doc_type: string;
+  node_id: string;
 }
 
 interface Source {
@@ -37,6 +38,27 @@ interface ApiResponse {
   invalid_sources: Source[];
 }
 
+const getTagColor = (docType: string): string => {
+  switch (docType) {
+    case "SEC Filing":
+      return "bg-green-100 text-green-800";
+    case "Industry Report":
+      return "bg-orange-100 text-orange-800";
+    case "IR/ Earnings Call":
+      return "bg-blue-100 text-blue-800";
+    case "Press":
+      return "bg-purple-100 text-purple-800";
+    case "Internals":
+      return "bg-pink-100 text-pink-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
+const formatContent = (content: string): string => {
+  return content.replace(/<\/?[^>]+(>|$)/g, "").replace(/[#*`]/g, "");
+};
+
 export default function SearchResultsPage() {
   const { currentQuery, setCurrentQuery } = useContext(SearchContext);
   const [searchResults, setSearchResults] = useState<ApiResponse | null>(null);
@@ -44,6 +66,10 @@ export default function SearchResultsPage() {
   const [error, setError] = useState<string | null>(null);
   const [showAiSummary, setShowAiSummary] = useState(false);
   const [selectedContent, setSelectedContent] = useState<Node | null>(null);
+  const [expandedSections, setExpandedSections] = useState({
+    valid: false,
+    invalid: false,
+  });
 
   const searchQuery = useSearchParams().get("query");
 
@@ -88,6 +114,7 @@ export default function SearchResultsPage() {
       }
 
       setSearchResults(data);
+      setExpandedSections({ valid: false, invalid: false });
     } catch (err) {
       console.error("Search error:", err);
       setError("Failed to fetch search results. Please try again.");
@@ -97,66 +124,81 @@ export default function SearchResultsPage() {
     }
   };
 
-  const isValidUrl = (url: string) => {
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
-  const renderSourceList = (sources: Source[], title: string) => {
+  const renderSourceList = (
+    sources: Source[],
+    title: string,
+    type: "valid" | "invalid"
+  ) => {
     const docTypes = Array.from(
       new Set(sources?.map((source) => source.doc_type))
     );
 
+    const isExpanded = expandedSections[type];
+    const visibleDocTypes = isExpanded ? docTypes : docTypes.slice(0, 1);
+
     return (
-      <Card className="">
-        <CardHeader className="border-b mb-2">
-          <CardTitle>{title}</CardTitle>
+      <Card className="bg-white rounded-lg shadow-sm h-full">
+        <CardHeader className="border-b p-4">
+          <CardTitle className="text-lg font-semibold">{title}</CardTitle>
         </CardHeader>
-        <CardContent className="h-[200px] overflow-y-auto">
-          <div className="space-y-4">
-            {docTypes.map((docType) => (
-              <div key={docType}>
-                <h4 className="font-semibold mb-2 text-[#333333] text-sm">
-                  {docType}
-                </h4>
-                <ul className="space-y-2">
-                  {sources
-                    .filter((source) => source.doc_type === docType)
-                    .map((source, index) =>
-                      isValidUrl(source.url) ? (
-                        <li key={index}>
-                          <a
-                            href={source.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 text-sm text-slate-600 hover:underline"
-                          >
-                            <Globe className="w-4 h-4 flex-shrink-0" />
-                            <span className="truncate">{source.title}</span>
-                          </a>
-                        </li>
-                      ) : (
-                        <li key={index}>
-                          <span>Invalid URL: {source.url}</span>
-                        </li>
-                      )
-                    )}
-                </ul>
+        <CardContent className="p-4">
+          {visibleDocTypes.map((docType) => (
+            <div key={docType} className="mb-6 last:mb-0">
+              <h4 className="text-sm font-medium text-gray-900 mb-3">
+                {docType}
+              </h4>
+              <div className="grid grid-cols-2 gap-3">
+                {sources
+                  .filter((s) => s.doc_type === docType)
+                  .map((source, index) => (
+                    <a
+                      key={index}
+                      href={source.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <Globe className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                      <span className="text-sm text-gray-600 truncate">
+                        {source.title}
+                      </span>
+                    </a>
+                  ))}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+          {docTypes.length > 1 && (
+            <button
+              onClick={() =>
+                setExpandedSections((prev) => ({
+                  ...prev,
+                  [type]: !prev[type],
+                }))
+              }
+              className="text-sm text-gray-500 hover:text-gray-700 mt-4 flex items-center gap-1"
+            >
+              {isExpanded ? "Show Less" : `+${docTypes.length - 1} Show More`}
+            </button>
+          )}
         </CardContent>
       </Card>
     );
   };
 
-  const handleAiSummarize = (content: Node) => {
-    setSelectedContent(content);
-    setShowAiSummary(true);
+  const handleAiSummarize = () => {
+    if (searchResults) {
+      const allContent = searchResults.response
+        .map((node) => node.content)
+        .join("\n\n");
+      setSelectedContent({
+        content: allContent,
+        source: "All Sources",
+        node_id: "all-results",
+        title: "Combined Results",
+        doc_type: "Summary",
+      });
+      setShowAiSummary(true);
+    }
   };
 
   const renderAiSummary = () => {
@@ -174,29 +216,189 @@ export default function SearchResultsPage() {
     );
   };
 
-  return (
-    <div className="container md:mx-auto p-6 max-w-7xl">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 md:mx-5 mt-8 md:mt-2">
-        <div className="flex-1 w-full sm:w-auto">
-          <h1 className="text-lg mb-4 sm:mb-0">
-            Search Result for:{" "}
-            <span className="font-medium">{currentQuery}</span>
-          </h1>
+  const renderResultCard = (content: Node) => {
+    return (
+      <Card className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col h-full w-full">
+        <CardContent className="p-6 flex flex-col flex-grow">
+          <Badge
+            variant="secondary"
+            className={`mb-4 ${getTagColor(
+              content.doc_type
+            )} text-xs font-medium px-3 py-1 rounded-full self-start`}
+          >
+            {content.doc_type}
+          </Badge>
+          <h3 className="text-lg font-semibold mb-2 line-clamp-2">
+            {content.title}
+          </h3>
+          <p className="text-gray-600 text-sm mb-4 flex-grow text-justify">
+            {formatContent(content.content)}
+          </p>
+          <div className="flex justify-between items-center">
+            <a
+              href={content.source}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-lg transition-colors max-w-full"
+            >
+              <span className="text-xs text-black font-medium hover:underline break-words line-clamp-1">
+                {content.title}
+              </span>
+            </a>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
+  const renderFilteredResults = (filter: string) => {
+    if (!searchResults) return null;
+
+    const filteredContent =
+      filter === "all"
+        ? searchResults.response
+        : searchResults.response.filter((content) =>
+            content.doc_type.toLowerCase().includes(filter.toLowerCase())
+          );
+
+    if (filteredContent.length === 0) {
+      return (
+        <div className="flex justify-center items-center p-8">
+          <p className="text-gray-500 text-center">
+            No results available for this category.
+          </p>
         </div>
-        <div className="flex items-center gap-4 w-full sm:w-auto justify-end">
-          <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Search className="h-12 w-12 object-contain" />
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 mt-6">
+        {filteredContent.map((content, index) => (
+          <div key={content.node_id || index} className="flex">
+            {renderResultCard(content)}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  const renderContentTabs = () => {
+    return (
+      <Tabs
+        defaultValue="all"
+        className="w-full flex flex-col items-start mb-10 md:mt-5"
+      >
+        <div className="my-1">
+          <TabsList className="flex flex-wrap gap-2 md:gap-4 w-full bg-transparent items-start">
+            {[
+              { value: "all", label: "All" },
+              { value: "sec", label: "SEC Filing" },
+              { value: "industry", label: "Industry Reports" },
+              { value: "earnings", label: "IR/ Earnings Call" },
+              { value: "press", label: "Press" },
+              { value: "internals", label: "Internals" },
+            ].map((tab) => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className="border px-4 py-2 font-normal text-xs rounded-md bg-[#F3F4F6] hover:bg-gray-100 hover:text-gray-900 transition-colors data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-[#384250]"
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
+
+        {[
+          { value: "all", filter: "all" },
+          { value: "sec", filter: "SEC Filing" },
+          { value: "industry", filter: "Industry Report" },
+          { value: "earnings", filter: "IR/ Earnings Call" },
+          { value: "press", filter: "Press" },
+          { value: "internals", filter: "Internals" },
+        ].map((tab) => (
+          <TabsContent key={tab.value} value={tab.value}>
+            {renderFilteredResults(tab.filter)}
+          </TabsContent>
+        ))}
+      </Tabs>
+    );
+  };
+
+  return (
+    <div className="container mx-auto p-6 max-w-7xl">
+      <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row md:items-center justify-between mb-6 mt-4">
+        <div className="flex flex-col w-full space-y-4 md:space-y-0 md:flex-row md:items-center md:space-x-4">
+          <div className="flex-1 max-w-2xl relative">
+            <SearchIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search"
+              value={currentQuery}
+              onChange={(e) => setCurrentQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-2.5 rounded-xl border border-[#E5E7EB] focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-purple-400 text-gray-700 placeholder-gray-500 text-base bg-white"
+            />
+          </div>
+          <button
+            onClick={() => handleSearch(currentQuery)}
+            disabled={isLoading}
+            className="px-8 py-2.5 rounded-xl font-medium text-white transition-all disabled:opacity-50 bg-[#7F56D9] hover:bg-[#6941C6]"
+            style={{
+              background: "linear-gradient(to right, #8B5CF6, #6366F1)",
+            }}
+          >
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <span>Loading...</span>
+              </div>
+            ) : (
+              "Search"
+            )}
+          </button>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="default" className="gap-2">
+              <Image
+                src="/icons/Excel.png"
+                alt="excel"
+                width={20}
+                height={20}
+                className="object-contain"
+              />
+              Export
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <Share2 className="h-12 w-12" />
-            </Button>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <MoreVertical className="h-12 w-12" />
+            <Button
+              size="default"
+              className="gap-2 bg-[#7C3AED] hover:bg-[#6D28D9]"
+            >
+              <Image
+                src="/icons/share.png"
+                alt="share"
+                width={20}
+                height={20}
+                className="object-contain"
+                style={{ filter: "invert(100%) brightness(5)" }}
+              />
+              Share
             </Button>
           </div>
         </div>
+      </div>
+
+      <div className="md:mx-5 flex items-center gap-5 my-5">
+        <h2 className="text-lg font-normal">
+          Search Result for: <span className="font-medium">{currentQuery}</span>
+        </h2>
+        <Button
+          variant="outline"
+          className="flex items-center gap-2 rounded-full bg-white w-full sm:w-auto"
+          onClick={handleAiSummarize}
+        >
+          <Image src={Stars} alt="stars" className="w-6 h-6 object-contain" />
+          <span className="bg-custom-gradient bg-clip-text text-transparent">
+            AI Summarize
+          </span>
+        </Button>
       </div>
 
       {error && (
@@ -206,165 +408,32 @@ export default function SearchResultsPage() {
       )}
 
       {isLoading ? (
-        <LoadingIndicator />
+        <LoadingIndicator  />
       ) : searchResults ? (
         <>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 md:mx-5 max-h-full">
-            <div className="lg:col-span-2">
-              <div className="border rounded-lg overflow-hidden">
-                <div className="h-[calc(100vh-170px)] overflow-y-auto px-6 py-1 space-y-2 shadow-lg rounded-xl">
-                  {searchResults.response?.length > 0 ? (
-                    searchResults.response.map((content, index) => (
-                      <div key={index} className="space-y-2">
-                        <div className="overflow-hidden prose">
-                          <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            rehypePlugins={[rehypeRaw as any]}
-                            className="text-gray-800"
-                            components={{
-                              a: (props) => (
-                                <a
-                                  href={props.href}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                >
-                                  {props.children}
-                                </a>
-                              ),
-                              mark: (props) => (
-                                <mark className="bg-yellow-300">
-                                  {props.children}
-                                </mark>
-                              ),
-                            }}
-                          >
-                            {content.content}
-                          </ReactMarkdown>
-                        </div>
-                        <div className="flex flex-col md:flex-row items-start justify-between md:items-center gap-2">
-                          <div className="text-blue-500 flex items-center w-1/2">
-                            {isValidUrl(content.source) ? (
-                              <p className="flex gap-x-1 line-clamp-1 items-center">
-                                <Globe className="w-5 h-5" />
-                                <a
-                                  href={content.source}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="truncate flex-1"
-                                >
-                                  {content.title}
-                                </a>
-                              </p>
-                            ) : (
-                              <p>Source not available</p>
-                            )}
-                          </div>
-                          <div className="flex flex-col md:flex-row gap-3 md:items-center">
-                            <div className="text-center px-2 py-1 text-purple-500 border-2 border-purple-200 bg-purple-100 rounded-lg transition-colors">
-                              {content.doc_type}
-                            </div>
-                            <Button
-                              variant="outline"
-                              className="flex items-center gap-2 rounded-full bg-white w-full sm:w-auto"
-                              onClick={() => handleAiSummarize(content)}
-                            >
-                              <Image
-                                src={Stars}
-                                alt="stars"
-                                className="w-6 h-6 object-contain"
-                              />
-                              <span className="bg-custom-gradient bg-clip-text text-transparent">
-                                AI Summarize
-                              </span>
-                            </Button>
-                          </div>
-                        </div>
-                        {index < searchResults.response.length - 1 && (
-                          <div className="border-b border-gray-200 mt-6" />
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <h1>No results found.</h1>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-6 w-full lg:col-span-1 h-full">
-              {showAiSummary ? (
-                <div className="h-full w-full lg:col-span-2">
-                  {renderAiSummary()}
-                </div>
-              ) : (
-                <>
-                  {searchResults.valid_sources.length > 0 &&
-                    renderSourceList(
-                      searchResults.valid_sources,
-                      "Found Answers From"
-                    )}
-                  {searchResults.invalid_sources.length > 0 &&
-                    renderSourceList(
-                      searchResults.invalid_sources,
-                      "No Answer Found From"
-                    )}
-                </>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {searchResults.valid_sources.length > 0 &&
+              renderSourceList(
+                searchResults.valid_sources,
+                "Found Answers From",
+                "valid"
               )}
-            </div>
+            {searchResults.invalid_sources.length > 0 &&
+              renderSourceList(
+                searchResults.invalid_sources,
+                "No Answer Found From",
+                "invalid"
+              )}
           </div>
 
-          <div className="w-full border my-8"></div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              {
-                title: "Elon Musk's Opening Remarks",
-                content:
-                  "Tesla is on track to hit record deliveries, supported by increasing adoption of EVs globally.",
-                link: "Read Earnings Call Transcript",
-                action: "SEC Filing",
-              },
-              {
-                title: "Income Statement Highlights",
-                content:
-                  "Revenue: $25.7B (+12% YoY), Gross Profit: $6.2B (-5% YoY), Net Income: $2.8B (-10% YoY).",
-                link: "View Tesla's Q3 2024 Income Statement",
-                action: "IR Presentation",
-              },
-              {
-                title: "Stock Performance Post-Earnings",
-                content:
-                  "Tesla's stock rose 6% post-earnings due to higher guidance for Q4.",
-                link: "Read Detailed Analysis",
-                action: "Industry Reports",
-              },
-              {
-                title: "Comparison with Rivian",
-                content:
-                  "Tesla's revenue growth outpaces Rivian's 8% YoY growth in Q3 Year 2024.",
-                link: "See Comparative Analysis",
-                action: "Industry Reports",
-              },
-            ].map((card, index) => (
-              <Card key={index} className="p-4">
-                <CardContent className="p-0">
-                  <h3 className="font-semibold mb-2">{card.title}</h3>
-                  <p className="text-sm text-gray-600 mb-4">{card.content}</p>
-                  <div className="flex flex-col items-start text-sm w-full space-y-2">
-                    <a
-                      href="#"
-                      className="text-[#0C0C0C] hover:underline w-full font-medium"
-                    >
-                      {card.link}
-                    </a>
-                    <div className="p-2 bg-[#F2EEFB] rounded-xl font-normal">
-                      <span className="text-[#333333]">{card.action}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {showAiSummary ? (
+            renderAiSummary()
+          ) : (
+            <>
+              <div className="border border-gray-100 w-full"></div>
+              {renderContentTabs()}
+            </>
+          )}
         </>
       ) : (
         <div className="text-center mt-8">
