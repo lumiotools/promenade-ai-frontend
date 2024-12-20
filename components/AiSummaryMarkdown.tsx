@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +31,8 @@ export function AiSummaryMarkdown({
   const [chatHistory, setChatHistory] = useState<
     Array<{ role: string; content: string }>
   >([]);
+
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   console.log(summary)
 
@@ -70,8 +72,7 @@ export function AiSummaryMarkdown({
 
       const data = await response.json();
 
-      const assistantContent =
-        typeof data === "string" ? data : JSON.stringify(data.response);
+      const assistantContent = data.response
 
       setSummary(assistantContent);
       setChatHistory([
@@ -136,12 +137,7 @@ export function AiSummaryMarkdown({
 
       const data = await response.json();
 
-      const assistantContent =
-        typeof data === "object" && data.content
-          ? data.content
-          : typeof data === "string"
-          ? data
-          : data.response;
+      const assistantContent = data.response;
 
       setSummary(assistantContent);
       setChatHistory([
@@ -165,6 +161,12 @@ export function AiSummaryMarkdown({
     }
   };
 
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  },[chatHistory])
+
   return (
     <Card className="max-w-4xl w-full">
       <CardHeader className="mb-2 flex flex-row items-center justify-between">
@@ -184,7 +186,7 @@ export function AiSummaryMarkdown({
           <div className="text-center text-red-500">{error}</div>
         ) : (
           <>
-            <div className="h-[calc(100vh-350px)] overflow-y-auto">
+            <div className="h-[calc(100vh-350px)] overflow-y-auto" ref={chatContainerRef}>
               {chatHistory.map((message, index) => (
                 <div
                   key={index}
@@ -194,7 +196,7 @@ export function AiSummaryMarkdown({
                 >
                   <div
                     className={`inline-block p-2 rounded-lg ${
-                      message.role === "user" ? "bg-blue-100" : "bg-gray-100"
+                      message.role === "user" ? "bg-blue-100" : "bg-gray-100 mr-2"
                     }`}
                   >
                     <ReactMarkdown
