@@ -7,21 +7,18 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft, Send } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { Node } from "@/app/search/page";
 
 interface AiSummaryMarkdownProps {
-  initialContent: string;
-  onBack: () => void;
-  nodeId: string;
+  nodes: Node[];
   searchQuery: string;
-  source: string;
+  onBack: () => void;
 }
 
 export function AiSummaryMarkdown({
-  initialContent,
-  onBack,
-  nodeId,
+  nodes,
   searchQuery,
-  source,
+  onBack,
 }: AiSummaryMarkdownProps) {
   const [summary, setSummary] = useState("");
   const [input, setInput] = useState("");
@@ -38,7 +35,7 @@ export function AiSummaryMarkdown({
 
   useEffect(() => {
     fetchInitialSummary();
-  }, [initialContent, nodeId, searchQuery]);
+  }, [nodes, searchQuery]);
 
   const fetchInitialSummary = async () => {
     setIsLoading(true);
@@ -53,12 +50,7 @@ export function AiSummaryMarkdown({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            node: {
-              node_id: nodeId,
-              content: initialContent,
-              source: source,
-              doc_type: "",
-            },
+            nodes,
             search_query: searchQuery,
             chat_history: [],
             message: "Provide me its summary",
@@ -118,12 +110,7 @@ export function AiSummaryMarkdown({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            node: {
-              node_id: nodeId,
-              content: initialContent,
-              source: source,
-              doc_type: "",
-            },
+            nodes,
             search_query: searchQuery,
             chat_history: chatHistory,
             message: input,

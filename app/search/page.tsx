@@ -13,8 +13,11 @@ import Stars from "../../public/icons/stars.png";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { CardTitle } from "../ui/card";
 import { AiSummaryMarkdown } from "@/components/AiSummaryMarkdown";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 
-interface Node {
+export interface Node {
   content: string;
   title: string;
   source: string;
@@ -202,16 +205,17 @@ export default function SearchResultsPage() {
   };
 
   const renderAiSummary = () => {
-    if (!selectedContent) return null;
+    if (!searchResults) return null;
 
     return (
       <AiSummaryMarkdown
-        key={`${selectedContent.source}-${Date.now()}`}
-        initialContent={selectedContent.content}
-        onBack={() => setShowAiSummary(false)}
-        nodeId={`${selectedContent.source}-${Date.now()}`}
-        source={selectedContent.source}
+        key={`${Date.now()}`}
+        nodes={searchResults.response}
         searchQuery={currentQuery}
+        onBack={() => setShowAiSummary(false)}
+        // initialContent={selectedContent.content}
+        // nodeId={`${selectedContent.source}-${Date.now()}`}
+        // source={selectedContent.source}
       />
     );
   };
@@ -231,9 +235,27 @@ export default function SearchResultsPage() {
           <h3 className="text-lg font-semibold mb-2 line-clamp-2">
             {content.title}
           </h3>
-          <p className="text-gray-600 text-sm mb-4 flex-grow text-justify">
+
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw as any]}
+            className="text-gray-600 mb-4 flex-grow prose"
+            components={{
+              a: (props) => (
+                <a href={props.href} target="_blank" rel="noreferrer">
+                  {props.children}
+                </a>
+              ),
+              mark: (props) => (
+                <mark className="bg-yellow-300">{props.children}</mark>
+              ),
+            }}
+          >
+            {content.content}
+          </ReactMarkdown>
+          {/* <p className="text-gray-600 text-sm mb-4 flex-grow text-justify">
             {formatContent(content.content)}
-          </p>
+          </p> */}
           <div className="flex justify-between items-center">
             <a
               href={content.source}
@@ -408,7 +430,7 @@ export default function SearchResultsPage() {
       )}
 
       {isLoading ? (
-        <LoadingIndicator  />
+        <LoadingIndicator />
       ) : searchResults ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
