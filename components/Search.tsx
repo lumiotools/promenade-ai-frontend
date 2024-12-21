@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { SearchIcon, Loader2, Eye, Telescope, Building2 } from "lucide-react";
+import { SearchIcon, Loader2, Telescope, Building2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import ValueChain from "../public/icons/value-chain.png";
@@ -26,7 +26,6 @@ export default function SearchPage({
 }: SearchPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchMode, setSearchMode] = useState<"sec" | "all" | "upload">("sec");
   const [activeModal, setActiveModal] = useState<
     "companyProfile" | "marketingTrends" | "valueChain" | "marketingMap" | null
   >(null);
@@ -70,18 +69,23 @@ export default function SearchPage({
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col">
+    <div className="relative min-h-screen flex flex-col items-end justify-end">
       <div
         className={cn(
-          "flex-grow flex flex-col items-center justify-center p-4 mt-10 md:mt-0 transition-all duration-200",
+          "flex-grow flex flex-col items-end justify-end p-4 mb-16 md:mt-0 transition-all duration-200",
           (activeModal !== null || isLoading) &&
             "blur-[2px] pointer-events-none"
         )}
       >
         <div className="w-full max-w-5xl text-center">
-          <h1 className="text-3xl md:text-3xl font-medium mb-6">
-            Search for any topics
-          </h1>
+          <div>
+            <p className="text-[#4D5761] font-normal">
+              Promenade AI Research Assistant
+            </p>
+            <h1 className="text-3xl md:text-3xl font-medium mb-6">
+              How may I assist you today?
+            </h1>
+          </div>
 
           <form
             onSubmit={handleSearch}
@@ -116,69 +120,61 @@ export default function SearchPage({
             </button>
           </form>
 
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
-            <button
-              type="button"
-              className={cn(
-                "px-6 py-2 rounded-xl transition-colors border text-sm text-[#545454]",
-                searchMode === "sec" ? "bg-white" : "bg-[#F3F3F3]"
-              )}
-              onClick={() => setSearchMode("sec")}
-            >
-              SEC Filing & IR Presentation only
-            </button>
-            <button
-              type="button"
-              className={cn(
-                "px-6 py-2 rounded-xl transition-colors border text-sm text-[#545454]",
-                searchMode === "all" ? "bg-white" : "bg-[#F3F3F3]"
-              )}
-              onClick={() => setSearchMode("all")}
-            >
-              All sources including web
-            </button>
-            <button
-              type="button"
-              className={cn(
-                "px-6 py-2 rounded-xl transition-colors border text-sm text-[#545454]",
-                searchMode === "upload" ? "bg-white" : "bg-[#F3F3F3]"
-              )}
-              onClick={() => setSearchMode("upload")}
-            >
-              Upload Internal File
-            </button>
-          </div>
-
           <div className="flex flex-col md:flex-row w-full mt-16 mb-3 items-center justify-between">
             <div></div>
             <h2 className="text-base font-light mb-2 text-[#333333]">
               Discover Key Insights to Enhance Your Search
             </h2>
-            <button className="hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-2 px-3 text-[#333333] rounded-lg">
-              <Eye className="w-3 h-3" />
-              See Preview
-            </button>
+            <div></div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div
-              className="p-6 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors"
-              onClick={() => handleOpenModal("marketingTrends")}
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenModal("marketingTrends");
+              }}
             >
-              <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
-                <Telescope className="w-5 h-5" />
+              <div className="relative flex justify-between items-start mb-2">
+                <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px]">
+                  <Telescope className="w-5 h-5" />
+                </div>
+                <button
+                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenModal("marketingTrends");
+                  }}
+                >
+                  See Preview
+                </button>
               </div>
-              <h3 className="font-semibold mb-2">Marketing Trends</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold mb-2 text-base">Marketing Trends</h3>
+              <p className="text-sm text-gray-600 w-full">
                 Get a comprehensive overview of key competitors
               </p>
             </div>
             <div
-              className="p-6 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors"
-              onClick={() => handleOpenModal("companyProfile")}
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenModal("companyProfile");
+              }}
             >
-              <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
-                <Building2 className="w-5 h-5" />
+              <div className="relative flex justify-between items-start mb-2">
+                <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px]">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <button
+                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenModal("companyProfile");
+                  }}
+                >
+                  See Preview
+                </button>
               </div>
               <h3 className="font-semibold mb-2">Company Profile</h3>
               <p className="text-sm text-gray-600">
@@ -186,11 +182,29 @@ export default function SearchPage({
               </p>
             </div>
             <div
-              className="p-6 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors"
-              onClick={() => handleOpenModal("valueChain")}
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenModal("valueChain");
+              }}
             >
-              <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
-                <Image src={ValueChain} alt="Value Chain" className="w-5 h-5" />
+              <div className="relative flex justify-between items-start mb-2">
+                <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px]">
+                  <Image
+                    src={ValueChain}
+                    alt="Value Chain"
+                    className="w-5 h-5"
+                  />
+                </div>
+                <button
+                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenModal("valueChain");
+                  }}
+                >
+                  See Preview
+                </button>
               </div>
               <h3 className="font-semibold mb-2">Value Chain</h3>
               <p className="text-sm text-gray-600">
@@ -198,11 +212,29 @@ export default function SearchPage({
               </p>
             </div>
             <div
-              className="p-6 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors"
-              onClick={() => handleOpenModal("marketingMap")}
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenModal("marketingMap");
+              }}
             >
-              <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px] mb-2">
-                <Image src={Birdeye} alt="Marketing Map" className="w-5 h-5" />
+              <div className="relative flex justify-between items-start mb-2">
+                <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px]">
+                  <Image
+                    src={Birdeye}
+                    alt="Marketing Map"
+                    className="w-5 h-5"
+                  />
+                </div>
+                <button
+                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenModal("marketingMap");
+                  }}
+                >
+                  See Preview
+                </button>
               </div>
               <h3 className="font-semibold mb-2">Marketing Map</h3>
               <p className="text-sm text-gray-600">
