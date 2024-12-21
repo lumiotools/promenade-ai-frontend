@@ -47,8 +47,10 @@ const getTagColor = (docType: string): string => {
       return "bg-green-100 text-green-800";
     case "Industry Report":
       return "bg-orange-100 text-orange-800";
-    case "IR/ Earnings Call":
+    case "IR Page":
       return "bg-blue-100 text-blue-800";
+    case "Earnings Call":
+      return "bg-cyan-100 text-cyan-800";
     case "Press":
       return "bg-purple-100 text-purple-800";
     case "Internals":
@@ -316,7 +318,8 @@ export default function SearchResultsPage() {
               { value: "all", label: "All" },
               { value: "sec", label: "SEC Filing" },
               { value: "industry", label: "Industry Reports" },
-              { value: "earnings", label: "IR/ Earnings Call" },
+              { value: "ir", label: "IR Page" },
+              { value: "earnings", label: "Earnings Call" },
               { value: "press", label: "Press" },
               { value: "internals", label: "Internals" },
             ].map((tab) => (
@@ -335,7 +338,8 @@ export default function SearchResultsPage() {
           { value: "all", filter: "all" },
           { value: "sec", filter: "SEC Filing" },
           { value: "industry", filter: "Industry Report" },
-          { value: "earnings", filter: "IR/ Earnings Call" },
+          { value: "ir", filter: "IR Page" },
+          { value: "earnings", filter: "Earnings Call" },
           { value: "press", filter: "Press" },
           { value: "internals", filter: "Internals" },
         ].map((tab) => (
