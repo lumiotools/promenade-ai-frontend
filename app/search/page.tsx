@@ -16,6 +16,7 @@ import { AiSummaryMarkdown } from "@/components/AiSummaryMarkdown";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
+import { useRouter } from "next/navigation";
 
 export interface Node {
   content: string;
@@ -77,6 +78,7 @@ export default function SearchResultsPage() {
   });
 
   const searchQuery = useSearchParams().get("query");
+  const router = useRouter();
 
   useEffect(() => {
     if (searchQuery) {
@@ -147,42 +149,64 @@ export default function SearchResultsPage() {
           <CardTitle className="text-lg font-semibold">{title}</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
-          {visibleDocTypes.map((docType) => (
-            <div key={docType} className="mb-6 last:mb-0">
-              <h4 className="text-sm font-medium text-gray-900 mb-3">
-                {docType}
-              </h4>
-              <div className="grid grid-cols-2 gap-3">
-                {sources
-                  .filter((s) => s.doc_type === docType)
-                  .map((source, index) => (
+          {visibleDocTypes.map((docType) => {
+            const docTypeSources = sources.filter(
+              (s) => s.doc_type === docType
+            );
+            const visibleSources = isExpanded
+              ? docTypeSources
+              : docTypeSources.slice(0, 4);
+            const hasMore = docTypeSources.length > 4;
+
+            return (
+              <div key={docType} className="mb-6 last:mb-0">
+                <h4 className="text-sm font-medium text-gray-900 mb-3">
+                  {docType}
+                </h4>
+                <div className="grid grid-cols-2 gap-3">
+                  {visibleSources.map((source, index) => (
                     <a
                       key={index}
                       href={source.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       <Globe className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                      <span className="text-sm text-gray-600 truncate">
+                      <span className="text-xs text-gray-600 truncate">
                         {source.title}
                       </span>
                     </a>
                   ))}
+                </div>
+                {hasMore && !isExpanded && (
+                  <button
+                    onClick={() =>
+                      setExpandedSections((prev) => ({
+                        ...prev,
+                        [type]: true,
+                      }))
+                    }
+                    className="text-sm text-gray-500 hover:text-gray-700 mt-2 flex items-center gap-1"
+                  >
+                    {`+${docTypeSources.length - 4} Show More`}
+                  </button>
+                )}
               </div>
-            </div>
-          ))}
-          {docTypes.length > 1 && (
+            );
+          })}
+
+          {isExpanded && docTypes.length > 0 && (
             <button
               onClick={() =>
                 setExpandedSections((prev) => ({
                   ...prev,
-                  [type]: !prev[type],
+                  [type]: false,
                 }))
               }
               className="text-sm text-gray-500 hover:text-gray-700 mt-4 flex items-center gap-1"
             >
-              {isExpanded ? "Show Less" : `+${docTypes.length - 1} Show More`}
+              Show Less
             </button>
           )}
         </CardContent>
@@ -296,7 +320,7 @@ export default function SearchResultsPage() {
     }
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-6 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 mt-6">
         {filteredContent.map((content, index) => (
           <div key={content.node_id || index} className="flex">
             {renderResultCard(content)}
@@ -352,7 +376,7 @@ export default function SearchResultsPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
+    <div className="container mx-auto p-6 max-w-7xl relative">
       <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row md:items-center justify-between mb-6 mt-4">
         <div className="flex flex-col w-full space-y-4 md:space-y-0 md:flex-row md:items-center md:space-x-4">
           <div className="flex-1 max-w-2xl relative">
@@ -385,7 +409,7 @@ export default function SearchResultsPage() {
           <div className="flex items-center gap-3">
             <Button variant="outline" size="default" className="gap-2">
               <Image
-                src="/icons/Excel.png"
+                src="/icons/Excel.svg"
                 alt="excel"
                 width={20}
                 height={20}
@@ -398,12 +422,12 @@ export default function SearchResultsPage() {
               className="gap-2 bg-[#7C3AED] hover:bg-[#6D28D9]"
             >
               <Image
-                src="/icons/share.png"
+                src="/icons/share.svg"
                 alt="share"
                 width={20}
                 height={20}
                 className="object-contain"
-                style={{ filter: "invert(100%) brightness(5)" }}
+                style={{ filter: "brightness(0) invert(1)" }}
               />
               Share
             </Button>
@@ -434,7 +458,12 @@ export default function SearchResultsPage() {
       )}
 
       {isLoading ? (
-        <LoadingIndicator />
+        <div className="flex items-center justify-center">
+          <LoadingIndicator
+            companyName={currentQuery}
+            onBack={() => router.push("/")}
+          />
+        </div>
       ) : searchResults ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
