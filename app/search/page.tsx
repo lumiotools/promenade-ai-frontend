@@ -61,10 +61,6 @@ const getTagColor = (docType: string): string => {
   }
 };
 
-const formatContent = (content: string): string => {
-  return content.replace(/<\/?[^>]+(>|$)/g, "").replace(/[#*`]/g, "");
-};
-
 export default function SearchResultsPage() {
   const { currentQuery, setCurrentQuery } = useContext(SearchContext);
   const [searchResults, setSearchResults] = useState<ApiResponse | null>(null);
@@ -76,6 +72,8 @@ export default function SearchResultsPage() {
     valid: false,
     invalid: false,
   });
+
+  console.log(selectedContent);
 
   const searchQuery = useSearchParams().get("query");
   const router = useRouter();
@@ -481,7 +479,11 @@ export default function SearchResultsPage() {
           </div>
 
           {showAiSummary ? (
-            renderAiSummary()
+            <div className="space-y-6">
+              {renderAiSummary()}
+              <div className="border border-gray-100 w-full"></div>
+              {renderContentTabs()}
+            </div>
           ) : (
             <>
               <div className="border border-gray-100 w-full"></div>
