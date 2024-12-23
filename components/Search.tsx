@@ -105,9 +105,6 @@ export default function SearchPage({
               type="submit"
               disabled={isLoading}
               className="px-6 py-1.5 rounded-xl font-medium text-white transition-opacity disabled:opacity-50 bg-[#7F56D9]"
-              style={{
-                background: "linear-gradient(to right, #8B5CF6, #6366F1)",
-              }}
             >
               {isLoading ? (
                 <div className="flex items-center justify-center">
