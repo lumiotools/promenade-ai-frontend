@@ -54,7 +54,7 @@ const getTagColor = (docType: string): string => {
       return "bg-cyan-100 text-cyan-800";
     case "Press":
       return "bg-purple-100 text-purple-800";
-    case "Internals":
+    case "Uploaded Document":
       return "bg-pink-100 text-pink-800";
     default:
       return "bg-gray-100 text-gray-800";
@@ -76,16 +76,17 @@ export default function SearchResultsPage() {
   console.log(selectedContent);
 
   const searchQuery = useSearchParams().get("query");
+  const searchFiles = useSearchParams().get("files");
   const router = useRouter();
 
   useEffect(() => {
     if (searchQuery) {
       setCurrentQuery(searchQuery);
-      handleSearch(searchQuery);
+      handleSearch(searchQuery,searchFiles?.split(",") ?? []);
     }
-  }, [searchQuery, setCurrentQuery]);
+  }, [searchQuery, searchFiles, setCurrentQuery]);
 
-  const handleSearch = async (query: string) => {
+  const handleSearch = async (query: string, searchFiles: string[] = []) => {
     if (!query.trim()) {
       setError("Please enter a search query");
       return;
@@ -104,6 +105,7 @@ export default function SearchResultsPage() {
           },
           body: JSON.stringify({
             message: query,
+            files: searchFiles,
           }),
         }
       );
@@ -343,7 +345,7 @@ export default function SearchResultsPage() {
               { value: "ir", label: "IR Page" },
               { value: "earnings", label: "Earnings Call" },
               { value: "press", label: "Press" },
-              { value: "internals", label: "Internals" },
+              { value: "uploadedDocument", label: "Uploaded Document" },
             ].map((tab) => (
               <TabsTrigger
                 key={tab.value}
@@ -363,7 +365,7 @@ export default function SearchResultsPage() {
           { value: "ir", filter: "IR Page" },
           { value: "earnings", filter: "Earnings Call" },
           { value: "press", filter: "Press" },
-          { value: "internals", filter: "Internals" },
+          { value: "uploadedDocument", filter: "Uploaded Document" },
         ].map((tab) => (
           <TabsContent key={tab.value} value={tab.value}>
             {renderFilteredResults(tab.filter)}
