@@ -41,6 +41,7 @@ export default function SearchPage({
   const router = useRouter();
 
   const [files, setFiles] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -61,7 +62,7 @@ export default function SearchPage({
       return;
     }
     setError(null);
-    setIsLoading(true);
+    setIsUploading(true);
     try {
       let searchUrl = `/search?query=${encodeURIComponent(currentQuery)}`;
       if (files.length > 0) {
@@ -87,10 +88,10 @@ export default function SearchPage({
 
         searchUrl += `&files=${encodeURIComponent(response.files.join(","))}`;
       }
-      setIsLoading(false);
+      setIsUploading(false);
       router.push(searchUrl);
     } catch (error) {
-      setIsLoading(false);
+      setIsUploading(false);
       setError("Failed to search. Please try again.");
     }
   };
@@ -188,10 +189,10 @@ export default function SearchPage({
             </div>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || isUploading}
               className="px-6 py-1.5 rounded-xl font-medium text-white transition-opacity disabled:opacity-50 bg-[#7F56D9]"
             >
-              {isLoading ? (
+              {isLoading || isUploading ? (
                 <div className="flex items-center justify-center">
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   <span>Loading...</span>
