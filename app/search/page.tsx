@@ -69,14 +69,13 @@ export default function SearchResultsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAiSummary] = useState(true);
-  const [selectedContent] = useState<Node | null>(null);
   const [expandedSections, setExpandedSections] = useState({
     valid: false,
     invalid: false,
   });
   const { toast } = useToast();
 
-  console.log(selectedContent);
+  console.log("Line 78 - searchResults",searchResults)
 
   const searchQuery = useSearchParams().get("query");
   const searchFiles = useSearchParams().get("files");
@@ -138,32 +137,35 @@ export default function SearchResultsPage() {
     title: string,
     type: "valid" | "invalid"
   ) => {
+    console.log("Line 138 - Sources",sources)
+
     const docTypes = Array.from(
       new Set(sources?.map((source) => source.doc_type))
     );
 
     const isExpanded = expandedSections[type];
     const visibleDocTypes = isExpanded ? docTypes : docTypes.slice(0, 1);
+    const hiddenDocTypesCount = docTypes.length - 1;
 
     return (
-      <Card className="bg-white rounded-lg shadow-sm h-full">
+      <Card className="bg-white rounded-lg shadow-sm h-full flex flex-col">
         <CardHeader className="border-b p-2">
           <CardTitle className="text-lg font-semibold">{title}</CardTitle>
         </CardHeader>
-        <CardContent className="p-4">
-          {visibleDocTypes.map((docType) => {
+        <CardContent className="p-2 flex-grow overflow-auto">
+          {visibleDocTypes.map((docType, docTypeIndex) => {
             const docTypeSources = sources.filter(
               (s) => s.doc_type === docType
             );
             const visibleSources = isExpanded
               ? docTypeSources
               : docTypeSources.slice(0, 4);
-            const hasMore = docTypeSources.length > 4;
+            const hiddenSourcesCount = docTypeSources.length - 4;
 
             return (
-              <div key={docType} className="mb-6 last:mb-0">
+              <div key={docType} className="mb-4 last:mb-0">
                 <h4 className="text-sm font-medium text-gray-900 mb-3">
-                  {docType}
+                  {docType} ({docTypeSources.length})
                 </h4>
                 <div className="grid grid-cols-2 gap-3">
                   {visibleSources.map((source, index) => (
@@ -181,24 +183,32 @@ export default function SearchResultsPage() {
                     </a>
                   ))}
                 </div>
-                {hasMore && !isExpanded && (
-                  <button
-                    onClick={() =>
-                      setExpandedSections((prev) => ({
-                        ...prev,
-                        [type]: true,
-                      }))
-                    }
-                    className="text-sm text-gray-500 hover:text-gray-700 mt-2 flex items-center gap-1"
-                  >
-                    {`+${docTypeSources.length - 4} Show More`}
-                  </button>
-                )}
+                {!isExpanded &&
+                  docTypeIndex === 0 &&
+                  hiddenSourcesCount > 0 && (
+                    <div className="text-sm text-gray-500 mt-2">
+                      +{hiddenSourcesCount} more
+                    </div>
+                  )}
               </div>
             );
           })}
 
-          {isExpanded && docTypes.length > 0 && (
+          {!isExpanded && hiddenDocTypesCount > 0 && (
+            <button
+              onClick={() =>
+                setExpandedSections((prev) => ({
+                  ...prev,
+                  [type]: true,
+                }))
+              }
+              className="text-sm text-gray-500 mt-2 hover:text-gray-700"
+            >
+              +{hiddenDocTypesCount} more
+            </button>
+          )}
+
+          {isExpanded && (
             <button
               onClick={() =>
                 setExpandedSections((prev) => ({
@@ -206,9 +216,9 @@ export default function SearchResultsPage() {
                   [type]: false,
                 }))
               }
-              className="text-sm text-gray-500 hover:text-gray-700 mt-4 flex items-center gap-1"
+              className="text-sm text-gray-500 mt-4 hover:text-gray-700"
             >
-              Show Less
+              Show less
             </button>
           )}
         </CardContent>
@@ -318,6 +328,14 @@ export default function SearchResultsPage() {
   };
 
   const renderContentTabs = () => {
+    const getCategoryCount = (filter: string) => {
+      if (!searchResults) return 0;
+      return filter === "all"
+        ? searchResults.response.length
+        : searchResults.response.filter((content) =>
+            content.doc_type.toLowerCase().includes(filter.toLowerCase())
+          ).length;
+    };
     return (
       <Tabs
         defaultValue="all"
@@ -326,20 +344,32 @@ export default function SearchResultsPage() {
         <div className="my-1">
           <TabsList className="flex flex-wrap gap-2 md:gap-4 w-full bg-transparent items-start">
             {[
-              { value: "all", label: "All" },
-              { value: "sec", label: "SEC Filing" },
-              { value: "industry", label: "Industry Reports" },
-              { value: "ir", label: "IR Page" },
-              { value: "earnings", label: "Earnings Call" },
-              { value: "press", label: "Press" },
-              { value: "uploadedDocument", label: "Uploaded Document" },
+              { value: "all", label: "All", filter: "all" },
+              { value: "sec", label: "SEC Filing", filter: "SEC Filing" },
+              {
+                value: "industry",
+                label: "Industry Reports",
+                filter: "Industry Report",
+              },
+              { value: "ir", label: "IR Page", filter: "IR Page" },
+              {
+                value: "earnings",
+                label: "Earnings Call",
+                filter: "Earnings Call",
+              },
+              { value: "press", label: "Press", filter: "Press" },
+              {
+                value: "uploadedDocument",
+                label: "Uploaded Document",
+                filter: "Uploaded Document",
+              },
             ].map((tab) => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
                 className="border px-4 py-2 font-normal text-xs rounded-md bg-[#F3F4F6] hover:bg-gray-100 hover:text-gray-900 transition-colors data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-[#384250]"
               >
-                {tab.label}
+                {tab.label} ({getCategoryCount(tab.filter)})
               </TabsTrigger>
             ))}
           </TabsList>
