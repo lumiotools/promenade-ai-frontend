@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { Globe, SearchIcon, Loader2 } from "lucide-react";
+import { Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { SearchContext } from "@/app/search-context";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-import Stars from "../../public/icons/stars.png";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { CardTitle } from "../ui/card";
 import { AiSummaryMarkdown } from "@/components/AiSummaryMarkdown";
@@ -68,8 +67,8 @@ export default function SearchResultsPage() {
   const [searchResults, setSearchResults] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showAiSummary, setShowAiSummary] = useState(true);
-  const [selectedContent, setSelectedContent] = useState<Node | null>(null);
+  const [showAiSummary] = useState(true);
+  const [selectedContent] = useState<Node | null>(null);
   const [expandedSections, setExpandedSections] = useState({
     valid: false,
     invalid: false,
@@ -126,7 +125,6 @@ export default function SearchResultsPage() {
       setExpandedSections({ valid: false, invalid: false });
     } catch (err) {
       console.error("Search error:", err);
-      setError("Failed to fetch search results. Please try again.");
       setSearchResults(null);
     } finally {
       setIsLoading(false);
@@ -147,7 +145,7 @@ export default function SearchResultsPage() {
 
     return (
       <Card className="bg-white rounded-lg shadow-sm h-full">
-        <CardHeader className="border-b p-4">
+        <CardHeader className="border-b p-2">
           <CardTitle className="text-lg font-semibold">{title}</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
@@ -216,22 +214,6 @@ export default function SearchResultsPage() {
     );
   };
 
-  // const handleAiSummarize = () => {
-  //   if (searchResults) {
-  //     const allContent = searchResults.response
-  //       .map((node) => node.content)
-  //       .join("\n\n");
-  //     setSelectedContent({
-  //       content: allContent,
-  //       source: "All Sources",
-  //       node_id: "all-results",
-  //       title: "Combined Results",
-  //       doc_type: "Summary",
-  //     });
-  //     setShowAiSummary(true);
-  //   }
-  // };
-
   const renderAiSummary = () => {
     if (!searchResults) return null;
 
@@ -239,12 +221,6 @@ export default function SearchResultsPage() {
       <AiSummaryMarkdown
         key={`${Date.now()}`}
         summary={searchResults.summary}
-        // nodes={searchResults.response}
-        // searchQuery={currentQuery}
-        // onBack={() => setShowAiSummary(false)}
-        // initialContent={selectedContent.content}
-        // nodeId={`${selectedContent.source}-${Date.now()}`}
-        // source={selectedContent.source}
       />
     );
   };
@@ -291,9 +267,6 @@ export default function SearchResultsPage() {
           >
             {highlightedContent + (isOverLimit ? "..." : "")}
           </ReactMarkdown>
-          {/* <p className="text-gray-600 text-sm mb-4 flex-grow text-justify">
-            {formatContent(content.content)}
-          </p> */}
           <div className="flex justify-between items-center">
             <a
               href={node.source}
@@ -389,79 +362,39 @@ export default function SearchResultsPage() {
 
   return (
     <div className="container mx-auto p-6 max-w-screen-2xl relative">
-      <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row md:items-center justify-between mb-6 mt-4">
-        <div className="flex flex-col w-full space-y-4 md:space-y-0 md:flex-row md:items-center md:space-x-4">
-          <div className="flex-1 max-w-2xl relative">
-            <SearchIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search"
-              value={currentQuery}
-              onChange={(e) => setCurrentQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-2 rounded-xl border border-[#E5E7EB] focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-purple-400 text-gray-700 placeholder-gray-500 text-base bg-white"
-            />
-          </div>
-          <div className="flex justify-center">
-            <button
-              onClick={() =>
-                handleSearch(currentQuery, searchFiles?.split(",") ?? [])
-              }
-              disabled={isLoading}
-              className="h-10 px-8 py-2 rounded-md font-medium text-white transition-all disabled:opacity-50 bg-[#7F56D9] hover:bg-[#6941C6]"
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  <span>Loading...</span>
-                </div>
-              ) : (
-                "Search"
-              )}
-            </button>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="default" className="h-10 gap-2">
-              <Image
-                src="/icons/Excel.svg"
-                alt="excel"
-                width={20}
-                height={20}
-                className="object-contain"
-              />
-              Export
-            </Button>
-            <Button
-              size="default"
-              className="h-10 gap-2 bg-[#7C3AED] hover:bg-[#6D28D9]"
-            >
-              <Image
-                src="/icons/Share.svg"
-                alt="share"
-                width={20}
-                height={20}
-                className="object-contain"
-                style={{ filter: "brightness(0) invert(1)" }}
-              />
-              Share
-            </Button>
-          </div>
+      <div className="flex justify-between mb-6 mt-4">
+        <div className="flex items-center gap-5">
+          <h2 className="text-lg font-normal">
+            Search Result for:{" "}
+            <span className="font-medium">{currentQuery}</span>
+          </h2>
         </div>
-      </div>
-
-      <div className="md:mx-5 flex items-center gap-5 my-5">
-        <h2 className="text-lg font-normal">
-          Search Result for: <span className="font-medium">{currentQuery}</span>
-        </h2>
-        {/* <Button
-          variant="outline"
-          className="flex items-center gap-2 rounded-full bg-white w-full sm:w-auto"
-          onClick={handleAiSummarize}
-        >
-          <Image src={Stars} alt="stars" className="w-6 h-6 object-contain" />
-          <span className="bg-custom-gradient bg-clip-text text-transparent">
-            AI Summarize
-          </span>
-        </Button> */}
+        <div className="flex space-x-4">
+          <Button variant="outline" size="default" className="h-10 gap-2">
+            <Image
+              src="/icons/Excel.svg"
+              alt="excel"
+              width={20}
+              height={20}
+              className="object-contain"
+            />
+            Export
+          </Button>
+          <Button
+            size="default"
+            className="h-10 gap-2 bg-[#7C3AED] hover:bg-[#6D28D9]"
+          >
+            <Image
+              src="/icons/Share.svg"
+              alt="share"
+              width={20}
+              height={20}
+              className="object-contain"
+              style={{ filter: "brightness(0) invert(1)" }}
+            />
+            Share
+          </Button>
+        </div>
       </div>
 
       {error && (
