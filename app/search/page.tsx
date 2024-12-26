@@ -16,6 +16,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { useRouter } from "next/navigation";
+import { useToast } from "../ui/use-toast";
 
 export interface Node {
   content: string;
@@ -73,6 +74,7 @@ export default function SearchResultsPage() {
     valid: false,
     invalid: false,
   });
+  const { toast } = useToast();
 
   console.log(selectedContent);
 
@@ -360,6 +362,24 @@ export default function SearchResultsPage() {
     );
   };
 
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copied",
+        description: "The URL has been copied to your clipboard",
+        duration: 3000,
+      });
+    } catch (err) {
+      toast({
+        title: "Failed to copy",
+        description: "Could not copy the URL to your clipboard",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto p-6 max-w-screen-2xl relative">
       <div className="flex justify-between mb-6 mt-4">
@@ -383,6 +403,7 @@ export default function SearchResultsPage() {
           <Button
             size="default"
             className="h-10 gap-2 bg-[#7C3AED] hover:bg-[#6D28D9]"
+            onClick={handleShare}
           >
             <Image
               src="/icons/Share.svg"
