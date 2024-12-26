@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 
 export interface Node {
   content: string;
+  highlight_words: string[];
   title: string;
   source: string;
   doc_type: string;
@@ -34,6 +35,7 @@ interface Source {
 
 interface ApiResponse {
   response: Node[];
+  summary: string;
   sources: Array<{
     score: number;
     url: string;
@@ -66,7 +68,7 @@ export default function SearchResultsPage() {
   const [searchResults, setSearchResults] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showAiSummary, setShowAiSummary] = useState(false);
+  const [showAiSummary, setShowAiSummary] = useState(true);
   const [selectedContent, setSelectedContent] = useState<Node | null>(null);
   const [expandedSections, setExpandedSections] = useState({
     valid: false,
@@ -82,7 +84,7 @@ export default function SearchResultsPage() {
   useEffect(() => {
     if (searchQuery) {
       setCurrentQuery(searchQuery);
-      handleSearch(searchQuery,searchFiles?.split(",") ?? []);
+      handleSearch(searchQuery, searchFiles?.split(",") ?? []);
     }
   }, [searchQuery, searchFiles, setCurrentQuery]);
 
@@ -214,21 +216,21 @@ export default function SearchResultsPage() {
     );
   };
 
-  const handleAiSummarize = () => {
-    if (searchResults) {
-      const allContent = searchResults.response
-        .map((node) => node.content)
-        .join("\n\n");
-      setSelectedContent({
-        content: allContent,
-        source: "All Sources",
-        node_id: "all-results",
-        title: "Combined Results",
-        doc_type: "Summary",
-      });
-      setShowAiSummary(true);
-    }
-  };
+  // const handleAiSummarize = () => {
+  //   if (searchResults) {
+  //     const allContent = searchResults.response
+  //       .map((node) => node.content)
+  //       .join("\n\n");
+  //     setSelectedContent({
+  //       content: allContent,
+  //       source: "All Sources",
+  //       node_id: "all-results",
+  //       title: "Combined Results",
+  //       doc_type: "Summary",
+  //     });
+  //     setShowAiSummary(true);
+  //   }
+  // };
 
   const renderAiSummary = () => {
     if (!searchResults) return null;
@@ -236,9 +238,10 @@ export default function SearchResultsPage() {
     return (
       <AiSummaryMarkdown
         key={`${Date.now()}`}
-        nodes={searchResults.response}
-        searchQuery={currentQuery}
-        onBack={() => setShowAiSummary(false)}
+        summary={searchResults.summary}
+        // nodes={searchResults.response}
+        // searchQuery={currentQuery}
+        // onBack={() => setShowAiSummary(false)}
         // initialContent={selectedContent.content}
         // nodeId={`${selectedContent.source}-${Date.now()}`}
         // source={selectedContent.source}
@@ -246,26 +249,35 @@ export default function SearchResultsPage() {
     );
   };
 
-  const renderResultCard = (content: Node) => {
+  const renderResultCard = (node: Node) => {
+    const limitedContent = node.content.split(" ").slice(0, 50).join(" ");
+    const isOverLimit = node.content.length > limitedContent.length;
+    let highlightedContent = limitedContent;
+    node.highlight_words.forEach((word) => {
+      highlightedContent = highlightedContent.replace(
+        new RegExp(word, "gi"),
+        `<mark>${word}</mark>`
+      );
+    });
     return (
       <Card className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col h-full w-full">
         <CardContent className="p-6 flex flex-col flex-grow">
           <Badge
             variant="secondary"
             className={`mb-4 ${getTagColor(
-              content.doc_type
+              node.doc_type
             )} text-xs font-medium px-3 py-1 rounded-full self-start`}
           >
-            {content.doc_type}
+            {node.doc_type}
           </Badge>
           <h3 className="text-lg font-semibold mb-2 line-clamp-2">
-            {content.title}
+            {node.title}
           </h3>
 
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             rehypePlugins={[rehypeRaw as any]}
-            className="text-gray-600 mb-4 flex-grow prose"
+            className="text-gray-600 mb-4 flex-grow prose !text-sm"
             components={{
               a: (props) => (
                 <a href={props.href} target="_blank" rel="noreferrer">
@@ -277,20 +289,20 @@ export default function SearchResultsPage() {
               ),
             }}
           >
-            {content.content}
+            {highlightedContent + (isOverLimit ? "..." : "")}
           </ReactMarkdown>
           {/* <p className="text-gray-600 text-sm mb-4 flex-grow text-justify">
             {formatContent(content.content)}
           </p> */}
           <div className="flex justify-between items-center">
             <a
-              href={content.source}
+              href={node.source}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 rounded-lg transition-colors max-w-full"
             >
               <span className="text-xs text-black font-medium hover:underline break-words line-clamp-1">
-                {content.title}
+                {node.title}
               </span>
             </a>
           </div>
@@ -376,7 +388,7 @@ export default function SearchResultsPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl relative">
+    <div className="container mx-auto p-6 max-w-screen-2xl relative">
       <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row md:items-center justify-between mb-6 mt-4">
         <div className="flex flex-col w-full space-y-4 md:space-y-0 md:flex-row md:items-center md:space-x-4">
           <div className="flex-1 max-w-2xl relative">
@@ -391,7 +403,9 @@ export default function SearchResultsPage() {
           </div>
           <div className="flex justify-center">
             <button
-              onClick={() => handleSearch(currentQuery,searchFiles?.split(",") ?? [])}
+              onClick={() =>
+                handleSearch(currentQuery, searchFiles?.split(",") ?? [])
+              }
               disabled={isLoading}
               className="h-10 px-8 py-2 rounded-md font-medium text-white transition-all disabled:opacity-50 bg-[#7F56D9] hover:bg-[#6941C6]"
             >
@@ -421,7 +435,7 @@ export default function SearchResultsPage() {
               className="h-10 gap-2 bg-[#7C3AED] hover:bg-[#6D28D9]"
             >
               <Image
-                src="/icons/share.svg"
+                src="/icons/Share.svg"
                 alt="share"
                 width={20}
                 height={20}
@@ -438,7 +452,7 @@ export default function SearchResultsPage() {
         <h2 className="text-lg font-normal">
           Search Result for: <span className="font-medium">{currentQuery}</span>
         </h2>
-        <Button
+        {/* <Button
           variant="outline"
           className="flex items-center gap-2 rounded-full bg-white w-full sm:w-auto"
           onClick={handleAiSummarize}
@@ -447,7 +461,7 @@ export default function SearchResultsPage() {
           <span className="bg-custom-gradient bg-clip-text text-transparent">
             AI Summarize
           </span>
-        </Button>
+        </Button> */}
       </div>
 
       {error && (
@@ -480,18 +494,10 @@ export default function SearchResultsPage() {
               )}
           </div>
 
-          {showAiSummary ? (
-            <div className="space-y-6">
-              {renderAiSummary()}
-              <div className="border border-gray-100 w-full"></div>
-              {renderContentTabs()}
-            </div>
-          ) : (
-            <>
-              <div className="border border-gray-100 w-full"></div>
-              {renderContentTabs()}
-            </>
-          )}
+          {showAiSummary ? renderAiSummary() : <></>}
+
+          <div className="border border-gray-100 w-full"></div>
+          {renderContentTabs()}
         </>
       ) : (
         <div className="text-center mt-8">

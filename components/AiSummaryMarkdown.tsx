@@ -16,139 +16,136 @@ interface AiSummaryMarkdownProps {
   onBack: () => void;
 }
 
-export function AiSummaryMarkdown({
-  nodes,
-  searchQuery,
-}: AiSummaryMarkdownProps) {
-  const [summary, setSummary] = useState("");
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [chatHistory, setChatHistory] = useState<
-    Array<{ role: string; content: string }>
-  >([]);
+export function AiSummaryMarkdown({ summary }: { summary: string }) {
+  // const [summary, setSummary] = useState("");
+  // const [input, setInput] = useState("");
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [error, setError] = useState<string | null>(null);
+  const [isExpanded, setIsExpanded] = useState(true);
+  // const [chatHistory, setChatHistory] = useState<
+  //   Array<{ role: string; content: string }>
+  // >([]);
 
-  console.log(summary, error);
+  // console.log(summary, error);
 
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  // const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    fetchInitialSummary();
-  }, [nodes, searchQuery]);
+  // useEffect(() => {
+  //   fetchInitialSummary();
+  // }, [nodes, searchQuery]);
 
-  const fetchInitialSummary = async () => {
-    setIsLoading(true);
-    setError(null);
+  // const fetchInitialSummary = async () => {
+  //   setIsLoading(true);
+  //   setError(null);
 
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/chat`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            nodes,
-            search_query: searchQuery,
-            chat_history: [],
-            message: "Provide me its summary",
-          }),
-        }
-      );
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.NEXT_PUBLIC_SERVER_URL}/chat`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           nodes,
+  //           search_query: searchQuery,
+  //           chat_history: [],
+  //           message: "Provide me its summary",
+  //         }),
+  //       }
+  //     );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch AI summary");
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch AI summary");
+  //     }
 
-      const data = await response.json();
-      const assistantContent = data.response;
+  //     const data = await response.json();
+  //     const assistantContent = data.response;
 
-      setSummary(assistantContent);
-      setChatHistory([
-        {
-          role: "assistant",
-          content: assistantContent,
-        },
-      ]);
-    } catch (error) {
-      console.error("Error fetching AI summary:", error);
-      setError("Failed to fetch AI summary. Please try again.");
-      setChatHistory([
-        {
-          role: "assistant",
-          content: "Failed to fetch AI summary. Please try again.",
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     setSummary(assistantContent);
+  //     setChatHistory([
+  //       {
+  //         role: "assistant",
+  //         content: assistantContent,
+  //       },
+  //     ]);
+  //   } catch (error) {
+  //     console.error("Error fetching AI summary:", error);
+  //     setError("Failed to fetch AI summary. Please try again.");
+  //     setChatHistory([
+  //       {
+  //         role: "assistant",
+  //         content: "Failed to fetch AI summary. Please try again.",
+  //       },
+  //     ]);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (!input.trim()) return;
 
-    setIsLoading(true);
-    setError(null);
+  //   setIsLoading(true);
+  //   setError(null);
 
-    const updatedChatHistory = [
-      ...chatHistory,
-      { role: "user", content: input },
-    ];
+  //   const updatedChatHistory = [
+  //     ...chatHistory,
+  //     { role: "user", content: input },
+  //   ];
 
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/chat`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            nodes,
-            search_query: searchQuery,
-            chat_history: chatHistory,
-            message: input,
-          }),
-        }
-      );
+  //   try {
+  //     const response = await fetch(
+  //       `${process.env.NEXT_PUBLIC_SERVER_URL}/chat`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           nodes,
+  //           search_query: searchQuery,
+  //           chat_history: chatHistory,
+  //           message: input,
+  //         }),
+  //       }
+  //     );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch AI response");
-      }
+  //     if (!response.ok) {
+  //       throw new Error("Failed to fetch AI response");
+  //     }
 
-      const data = await response.json();
-      const assistantContent = data.response;
+  //     const data = await response.json();
+  //     const assistantContent = data.response;
 
-      setSummary(assistantContent);
-      setChatHistory([
-        ...updatedChatHistory,
-        { role: "assistant", content: assistantContent },
-      ]);
-      setInput("");
-    } catch (error) {
-      console.error("Error fetching AI response:", error);
-      setError("Failed to fetch AI response. Please try again.");
-      setChatHistory([
-        ...updatedChatHistory,
-        {
-          role: "assistant",
-          content: "Failed to fetch AI response. Please try again.",
-        },
-      ]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     setSummary(assistantContent);
+  //     setChatHistory([
+  //       ...updatedChatHistory,
+  //       { role: "assistant", content: assistantContent },
+  //     ]);
+  //     setInput("");
+  //   } catch (error) {
+  //     console.error("Error fetching AI response:", error);
+  //     setError("Failed to fetch AI response. Please try again.");
+  //     setChatHistory([
+  //       ...updatedChatHistory,
+  //       {
+  //         role: "assistant",
+  //         content: "Failed to fetch AI response. Please try again.",
+  //       },
+  //     ]);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop =
-        chatContainerRef.current.scrollHeight;
-    }
-  }, [chatHistory]);
+  // useEffect(() => {
+  //   if (chatContainerRef.current) {
+  //     chatContainerRef.current.scrollTop =
+  //       chatContainerRef.current.scrollHeight;
+  //   }
+  // }, [chatHistory]);
 
   if (!isExpanded) {
     return (
@@ -169,7 +166,14 @@ export function AiSummaryMarkdown({
     <div className="w-full space-y-2">
       <Card className="w-full bg-white shadow-sm rounded-lg overflow-hidden">
         <CardContent className="p-4">
-          <div className="flex items-start mb-4">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            className="prose max-w-none"
+          >
+            {"## Search Results Summary\n" + summary}
+          </ReactMarkdown>
+
+          {/* <div className="flex items-start mb-4">
             <Button
               variant="ghost"
               className="hover:bg-transparent p-0 flex items-center gap-2 text-gray-600"
@@ -178,8 +182,8 @@ export function AiSummaryMarkdown({
               <ArrowLeft className="w-4 h-4" />
               Back to Results
             </Button>
-          </div>
-          <div
+          </div> */}
+          {/* <div
             className="max-h-[400px] overflow-y-auto mb-4 space-y-4"
             ref={chatContainerRef}
           >
@@ -212,8 +216,8 @@ export function AiSummaryMarkdown({
                 <div className="animate-pulse">AI is thinking...</div>
               </div>
             )}
-          </div>
-          <form
+          </div> */}
+          {/* <form
             onSubmit={handleSubmit}
             className="flex items-center gap-2 pt-4 border-t border-gray-100"
           >
@@ -231,7 +235,7 @@ export function AiSummaryMarkdown({
             >
               <Send className="h-4 w-4" />
             </Button>
-          </form>
+          </form> */}
         </CardContent>
       </Card>
     </div>
