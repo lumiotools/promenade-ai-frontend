@@ -614,7 +614,7 @@ export default function SearchResultsPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl relative">
+    <div className="container mx-auto p-6 max-w-screen-2xl relative">
       <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row md:items-center justify-between mb-6 mt-4">
         <div className="flex flex-col w-full space-y-4 md:space-y-0 md:flex-row md:items-center md:space-x-4">
           <div className="flex-1 max-w-2xl relative">
