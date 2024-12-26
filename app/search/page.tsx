@@ -391,7 +391,7 @@ export default function SearchResultsPage() {
           </div>
           <div className="flex justify-center">
             <button
-              onClick={() => handleSearch(currentQuery)}
+              onClick={() => handleSearch(currentQuery,searchFiles?.split(",") ?? [])}
               disabled={isLoading}
               className="h-10 px-8 py-2 rounded-md font-medium text-white transition-all disabled:opacity-50 bg-[#7F56D9] hover:bg-[#6941C6]"
             >
