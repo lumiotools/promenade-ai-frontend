@@ -17,6 +17,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export interface Node {
   content: string;
@@ -131,6 +132,71 @@ export default function SearchResultsPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const renderSkeletonLoading = () => {
+    return (
+      <>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Card className="bg-white rounded-lg shadow-sm h-full">
+            <CardHeader className="border-b p-4">
+              <CardTitle className="text-lg font-semibold">
+                Found Answers From
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 grid grid-cols-2 gap-4">
+              <Skeleton className="w-full h-4" />
+              <Skeleton className="w-full h-4" />
+              <Skeleton className="w-full h-4" />
+              <Skeleton className="w-full h-4" />
+            </CardContent>
+          </Card>
+          <Card className="bg-white rounded-lg shadow-sm h-full">
+            <CardHeader className="border-b p-4">
+              <CardTitle className="text-lg font-semibold">
+                No Answer Found From
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 grid grid-cols-2 gap-4">
+              <Skeleton className="w-full h-4" />
+              <Skeleton className="w-full h-4" />
+              <Skeleton className="w-full h-4" />
+              <Skeleton className="w-full h-4" />
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="w-full bg-white shadow-sm rounded-lg overflow-hidden">
+          <CardContent className="p-4">
+            <div className="prose">
+              <h2>Search Results Summary</h2>
+            </div>
+            <div className="flex flex-col gap-3 my-4">
+              <Skeleton className="w-2/3 h-4" />
+              <Skeleton className="w-2/5 h-4" />
+              <Skeleton className="w-2/4 h-4" />
+              <Skeleton className="w-4/5 h-4" />
+              <Skeleton className="w-3/5 h-4" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="flex gap-4 my-8">
+          <Skeleton className="w-40 h-12" />
+          <Skeleton className="w-56 h-12" />
+          <Skeleton className="w-36 h-12" />
+          <Skeleton className="w-28 h-12" />
+          <Skeleton className="w-44 h-12" />
+        </div>
+
+        <div className="grid grid-cols-4 gap-8">
+          <Skeleton className="w-full aspect-video" />
+          <Skeleton className="w-full aspect-video" />
+          <Skeleton className="w-full aspect-video" />
+          <Skeleton className="w-full aspect-video" />
+        </div>
+      </>
+    );
   };
 
   const renderSourceList = (
@@ -471,12 +537,7 @@ export default function SearchResultsPage() {
       )}
 
       {isLoading ? (
-        <div className="flex items-center justify-center">
-          <LoadingIndicator
-            companyName={currentQuery}
-            onBack={() => router.push("/")}
-          />
-        </div>
+        renderSkeletonLoading()
       ) : searchResults ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -504,6 +565,15 @@ export default function SearchResultsPage() {
           <p className="text-xl text-gray-600">
             No search results available. Please perform a search.
           </p>
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="absolute w-full h-screen top-0 left-0 flex justify-center items-center backdrop-blur-sm">
+          <LoadingIndicator
+            companyName={currentQuery}
+            onBack={() => router.push("/")}
+          />
         </div>
       )}
     </div>
