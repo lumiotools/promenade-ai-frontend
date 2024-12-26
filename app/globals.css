@@ -91,4 +91,16 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+
+  ::-webkit-scrollbar {
+    @apply size-3;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded-full p-2 m-2;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full hover:bg-gray-400/65 active:bg-gray-400/90;
+  }
 }
