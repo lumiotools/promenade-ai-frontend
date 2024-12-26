@@ -54,15 +54,11 @@ const getTagColor = (docType: string): string => {
       return "bg-cyan-100 text-cyan-800";
     case "Press":
       return "bg-purple-100 text-purple-800";
-    case "Internals":
+    case "Uploaded Document":
       return "bg-pink-100 text-pink-800";
     default:
       return "bg-gray-100 text-gray-800";
   }
-};
-
-const formatContent = (content: string): string => {
-  return content.replace(/<\/?[^>]+(>|$)/g, "").replace(/[#*`]/g, "");
 };
 
 export default function SearchResultsPage() {
@@ -77,17 +73,20 @@ export default function SearchResultsPage() {
     invalid: false,
   });
 
+  console.log(selectedContent);
+
   const searchQuery = useSearchParams().get("query");
+  const searchFiles = useSearchParams().get("files");
   const router = useRouter();
 
   useEffect(() => {
     if (searchQuery) {
       setCurrentQuery(searchQuery);
-      handleSearch(searchQuery);
+      handleSearch(searchQuery,searchFiles?.split(",") ?? []);
     }
-  }, [searchQuery, setCurrentQuery]);
+  }, [searchQuery, searchFiles, setCurrentQuery]);
 
-  const handleSearch = async (query: string) => {
+  const handleSearch = async (query: string, searchFiles: string[] = []) => {
     if (!query.trim()) {
       setError("Please enter a search query");
       return;
@@ -106,6 +105,7 @@ export default function SearchResultsPage() {
           },
           body: JSON.stringify({
             message: query,
+            files: searchFiles,
           }),
         }
       );
@@ -173,7 +173,7 @@ export default function SearchResultsPage() {
                       className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       <Globe className="w-4 h-4 text-gray-500 flex-shrink-0" />
-                      <span className="text-xs text-gray-600 truncate">
+                      <span className="text-xs text-gray-600 truncate font-normal">
                         {source.title}
                       </span>
                     </a>
@@ -345,7 +345,7 @@ export default function SearchResultsPage() {
               { value: "ir", label: "IR Page" },
               { value: "earnings", label: "Earnings Call" },
               { value: "press", label: "Press" },
-              { value: "internals", label: "Internals" },
+              { value: "uploadedDocument", label: "Uploaded Document" },
             ].map((tab) => (
               <TabsTrigger
                 key={tab.value}
@@ -365,7 +365,7 @@ export default function SearchResultsPage() {
           { value: "ir", filter: "IR Page" },
           { value: "earnings", filter: "Earnings Call" },
           { value: "press", filter: "Press" },
-          { value: "internals", filter: "Internals" },
+          { value: "uploadedDocument", filter: "Uploaded Document" },
         ].map((tab) => (
           <TabsContent key={tab.value} value={tab.value}>
             {renderFilteredResults(tab.filter)}
@@ -386,28 +386,27 @@ export default function SearchResultsPage() {
               placeholder="Search"
               value={currentQuery}
               onChange={(e) => setCurrentQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-2.5 rounded-xl border border-[#E5E7EB] focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-purple-400 text-gray-700 placeholder-gray-500 text-base bg-white"
+              className="w-full pl-12 pr-4 py-2 rounded-xl border border-[#E5E7EB] focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-purple-400 text-gray-700 placeholder-gray-500 text-base bg-white"
             />
           </div>
-          <button
-            onClick={() => handleSearch(currentQuery)}
-            disabled={isLoading}
-            className="px-8 py-2.5 rounded-xl font-medium text-white transition-all disabled:opacity-50 bg-[#7F56D9] hover:bg-[#6941C6]"
-            style={{
-              background: "linear-gradient(to right, #8B5CF6, #6366F1)",
-            }}
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center">
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                <span>Loading...</span>
-              </div>
-            ) : (
-              "Search"
-            )}
-          </button>
+          <div className="flex justify-center">
+            <button
+              onClick={() => handleSearch(currentQuery)}
+              disabled={isLoading}
+              className="h-10 px-8 py-2 rounded-md font-medium text-white transition-all disabled:opacity-50 bg-[#7F56D9] hover:bg-[#6941C6]"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  <span>Loading...</span>
+                </div>
+              ) : (
+                "Search"
+              )}
+            </button>
+          </div>
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="default" className="gap-2">
+            <Button variant="outline" size="default" className="h-10 gap-2">
               <Image
                 src="/icons/Excel.svg"
                 alt="excel"
@@ -419,7 +418,7 @@ export default function SearchResultsPage() {
             </Button>
             <Button
               size="default"
-              className="gap-2 bg-[#7C3AED] hover:bg-[#6D28D9]"
+              className="h-10 gap-2 bg-[#7C3AED] hover:bg-[#6D28D9]"
             >
               <Image
                 src="/icons/share.svg"
@@ -482,7 +481,11 @@ export default function SearchResultsPage() {
           </div>
 
           {showAiSummary ? (
-            renderAiSummary()
+            <div className="space-y-6">
+              {renderAiSummary()}
+              <div className="border border-gray-100 w-full"></div>
+              {renderContentTabs()}
+            </div>
           ) : (
             <>
               <div className="border border-gray-100 w-full"></div>

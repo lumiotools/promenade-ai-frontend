@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Menu, Search, Upload, Globe, FileText } from "lucide-react";
 import { SearchContext } from "@/app/search-context";
 import Image from "next/image";
-import logo from "../public/images/logo pro.png";
+import logo from "../public/images/promenade logo.svg";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -89,9 +89,8 @@ export function AppSidebar() {
       >
         {/* Header */}
         <div className="p-4 space-y-4">
-          <div className="flex items-center gap-2">
-            <Image src={logo} alt="Promenade" width={32} height={32} />
-            <span className="font-semibold text-lg">PROMENADE</span>
+          <div className="flex items-center justify-center gap-2 mt-5">
+            <Image src={logo} alt="Promenade" width={140} height={140} className="object-cover"/>
           </div>
 
           {/* New Search Button */}
@@ -103,17 +102,20 @@ export function AppSidebar() {
                 "linear-gradient(91.93deg, #F8F5B1 2.3%, #C6A1FD 35.25%, #89FDD6 66.76%, #9294F0 97.79%)",
             }}
           >
-            <span>+ New</span>
+            <div className="flex items-center justify-center w-full gap-2 text-center">
+              <span className="text-4xl font-light text-center mb-2">+</span>
+              <span className="text-base font-semibold">New</span>
+            </div>
           </button>
 
           {/* Search History Input */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
             <Input
               value={searchHistory}
               onChange={(e) => setSearchHistory(e.target.value)}
               placeholder="Search History"
-              className="w-full bg-[#1C1C1C] border-0 pl-10 text-sm text-gray-300 placeholder:text-gray-500 focus-visible:ring-1 focus-visible:ring-gray-700"
+              className=" outline-none w-full bg-[#1C1C1C] pl-10 text-sm text-gray-300 placeholder:text-gray-400 border border-[#38383A]"
             />
           </div>
         </div>
@@ -135,7 +137,7 @@ export function AppSidebar() {
         {/* Footer */}
         <div className="p-4 space-y-4">
           {/* Upload Button */}
-          <button className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-[#42307D] transition-colors text-sm font-medium">
+          <button className="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-[#42307D] transition-colors text-sm font-normal">
             <Upload className="h-4 w-4" />
             Upload Internal File
           </button>

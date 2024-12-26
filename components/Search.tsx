@@ -1,8 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { SearchIcon, Loader2, Telescope, Building2 } from "lucide-react";
+import {
+  SearchIcon,
+  Loader2,
+  Telescope,
+  Building2,
+  Paperclip,
+  File,
+  FileText,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import ValueChain from "../public/icons/value-chain.png";
@@ -31,6 +40,21 @@ export default function SearchPage({
   >(null);
   const router = useRouter();
 
+  const [files, setFiles] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFilesAttach = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+
+    if (!files) {
+      return;
+    }
+
+    setFiles(Array.from(files));
+  };
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentQuery.trim()) {
@@ -38,7 +62,38 @@ export default function SearchPage({
       return;
     }
     setError(null);
-    router.push(`/search?query=${encodeURIComponent(currentQuery)}`);
+    setIsUploading(true);
+    try {
+      let searchUrl = `/search?query=${encodeURIComponent(currentQuery)}`;
+      if (files.length > 0) {
+        const formData = new FormData();
+        files.forEach((file) => {
+          formData.append("files", file);
+        });
+
+        const response = await (
+          await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/upload_files`, {
+            method: "POST",
+            body: formData,
+          })
+        ).json();
+
+        if (!response.success) {
+          throw new Error("Failed to upload files");
+        }
+
+        if (response.files.length === 0) {
+          throw new Error("No files uploaded");
+        }
+
+        searchUrl += `&files=${encodeURIComponent(response.files.join(","))}`;
+      }
+      setIsUploading(false);
+      router.push(searchUrl);
+    } catch (error) {
+      setIsUploading(false);
+      setError("Failed to search. Please try again.");
+    }
   };
 
   const handleModalSubmit = async () => {
@@ -98,18 +153,46 @@ export default function SearchPage({
                 placeholder="Search"
                 value={currentQuery}
                 onChange={(e) => setCurrentQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-2 rounded-xl border border-[#B0B0B0] focus:outline-none focus:ring-1 focus:ring-purple-100 focus:border-purple-400 text-gray-700 placeholder-gray-500 text-lg bg-white"
+                className="w-full px-12 py-2 rounded-xl border border-[#B0B0B0] focus:outline-none focus:ring-1 focus:ring-purple-100 focus:border-purple-400 text-gray-700 placeholder-gray-500 text-lg bg-white"
+              />
+              {files.length > 0 ? (
+                <div className="absolute right-4 top-1/2 size-6 -translate-y-1/2">
+                  <FileText className="size-6 text-[#7F56D9]" />
+                  <p className="absolute top-3 left-4 text-xs bg-[#7F56D9] rounded-full px-1 text-white">
+                    {files.length}
+                  </p>
+                  <button
+                    type="button"
+                    className="absolute bottom-4 left-4 text-xs bg-destructive rounded-full p-0.5 text-white transition-all ease-in-out duration-150"
+                    onClick={() => setFiles([])}
+                  >
+                    <X className="size-3" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="text-gray-400 hover:text-[#7F56D9] transition-all ease-in-out duration-150"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Paperclip className="absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2" />
+                </button>
+              )}
+              <input
+                type="file"
+                accept="application/pdf"
+                multiple
+                className="hidden"
+                ref={fileInputRef}
+                onChange={handleFilesAttach}
               />
             </div>
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || isUploading}
               className="px-6 py-1.5 rounded-xl font-medium text-white transition-opacity disabled:opacity-50 bg-[#7F56D9]"
-              style={{
-                background: "linear-gradient(to right, #8B5CF6, #6366F1)",
-              }}
             >
-              {isLoading ? (
+              {isLoading || isUploading ? (
                 <div className="flex items-center justify-center">
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   <span>Loading...</span>
