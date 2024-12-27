@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useContext } from "react";
-import { Globe, SearchIcon, Loader2 } from "lucide-react";
+import { Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { SearchContext } from "@/app/search-context";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-import Stars from "../../public/icons/stars.png";
 import { LoadingIndicator } from "@/components/LoadingIndicator";
 import { CardTitle } from "../ui/card";
 import { AiSummaryMarkdown } from "@/components/AiSummaryMarkdown";
@@ -18,6 +17,7 @@ import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "../ui/use-toast";
 
 export interface Node {
   content: string;
@@ -69,14 +69,14 @@ export default function SearchResultsPage() {
   const [searchResults, setSearchResults] = useState<ApiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showAiSummary, setShowAiSummary] = useState(true);
-  const [selectedContent, setSelectedContent] = useState<Node | null>(null);
+  const [showAiSummary] = useState(true);
   const [expandedSections, setExpandedSections] = useState({
     valid: false,
     invalid: false,
   });
+  const { toast } = useToast();
 
-  console.log(selectedContent);
+  console.log("Line 78 - searchResults",searchResults)
 
   const searchQuery = useSearchParams().get("query");
   const searchFiles = useSearchParams().get("files");
@@ -127,7 +127,6 @@ export default function SearchResultsPage() {
       setExpandedSections({ valid: false, invalid: false });
     } catch (err) {
       console.error("Search error:", err);
-      setError("Failed to fetch search results. Please try again.");
       setSearchResults(null);
     } finally {
       setIsLoading(false);
@@ -204,32 +203,35 @@ export default function SearchResultsPage() {
     title: string,
     type: "valid" | "invalid"
   ) => {
+    console.log("Line 138 - Sources",sources)
+
     const docTypes = Array.from(
       new Set(sources?.map((source) => source.doc_type))
     );
 
     const isExpanded = expandedSections[type];
     const visibleDocTypes = isExpanded ? docTypes : docTypes.slice(0, 1);
+    const hiddenDocTypesCount = docTypes.length - 1;
 
     return (
-      <Card className="bg-white rounded-lg shadow-sm h-full">
-        <CardHeader className="border-b p-4">
+      <Card className="bg-white rounded-lg shadow-sm h-full flex flex-col">
+        <CardHeader className="border-b p-2">
           <CardTitle className="text-lg font-semibold">{title}</CardTitle>
         </CardHeader>
-        <CardContent className="p-4">
-          {visibleDocTypes.map((docType) => {
+        <CardContent className="p-2 flex-grow overflow-auto">
+          {visibleDocTypes.map((docType, docTypeIndex) => {
             const docTypeSources = sources.filter(
               (s) => s.doc_type === docType
             );
             const visibleSources = isExpanded
               ? docTypeSources
               : docTypeSources.slice(0, 4);
-            const hasMore = docTypeSources.length > 4;
+            const hiddenSourcesCount = docTypeSources.length - 4;
 
             return (
-              <div key={docType} className="mb-6 last:mb-0">
+              <div key={docType} className="mb-4 last:mb-0">
                 <h4 className="text-sm font-medium text-gray-900 mb-3">
-                  {docType}
+                  {docType} ({docTypeSources.length})
                 </h4>
                 <div className="grid grid-cols-2 gap-3">
                   {visibleSources.map((source, index) => (
@@ -247,24 +249,32 @@ export default function SearchResultsPage() {
                     </a>
                   ))}
                 </div>
-                {hasMore && !isExpanded && (
-                  <button
-                    onClick={() =>
-                      setExpandedSections((prev) => ({
-                        ...prev,
-                        [type]: true,
-                      }))
-                    }
-                    className="text-sm text-gray-500 hover:text-gray-700 mt-2 flex items-center gap-1"
-                  >
-                    {`+${docTypeSources.length - 4} Show More`}
-                  </button>
-                )}
+                {!isExpanded &&
+                  docTypeIndex === 0 &&
+                  hiddenSourcesCount > 0 && (
+                    <div className="text-sm text-gray-500 mt-2">
+                      +{hiddenSourcesCount} more
+                    </div>
+                  )}
               </div>
             );
           })}
 
-          {isExpanded && docTypes.length > 0 && (
+          {!isExpanded && hiddenDocTypesCount > 0 && (
+            <button
+              onClick={() =>
+                setExpandedSections((prev) => ({
+                  ...prev,
+                  [type]: true,
+                }))
+              }
+              className="text-sm text-gray-500 mt-2 hover:text-gray-700"
+            >
+              +{hiddenDocTypesCount} more
+            </button>
+          )}
+
+          {isExpanded && (
             <button
               onClick={() =>
                 setExpandedSections((prev) => ({
@@ -272,31 +282,15 @@ export default function SearchResultsPage() {
                   [type]: false,
                 }))
               }
-              className="text-sm text-gray-500 hover:text-gray-700 mt-4 flex items-center gap-1"
+              className="text-sm text-gray-500 mt-4 hover:text-gray-700"
             >
-              Show Less
+              Show less
             </button>
           )}
         </CardContent>
       </Card>
     );
   };
-
-  // const handleAiSummarize = () => {
-  //   if (searchResults) {
-  //     const allContent = searchResults.response
-  //       .map((node) => node.content)
-  //       .join("\n\n");
-  //     setSelectedContent({
-  //       content: allContent,
-  //       source: "All Sources",
-  //       node_id: "all-results",
-  //       title: "Combined Results",
-  //       doc_type: "Summary",
-  //     });
-  //     setShowAiSummary(true);
-  //   }
-  // };
 
   const renderAiSummary = () => {
     if (!searchResults) return null;
@@ -305,12 +299,6 @@ export default function SearchResultsPage() {
       <AiSummaryMarkdown
         key={`${Date.now()}`}
         summary={searchResults.summary}
-        // nodes={searchResults.response}
-        // searchQuery={currentQuery}
-        // onBack={() => setShowAiSummary(false)}
-        // initialContent={selectedContent.content}
-        // nodeId={`${selectedContent.source}-${Date.now()}`}
-        // source={selectedContent.source}
       />
     );
   };
@@ -357,9 +345,6 @@ export default function SearchResultsPage() {
           >
             {highlightedContent + (isOverLimit ? "..." : "")}
           </ReactMarkdown>
-          {/* <p className="text-gray-600 text-sm mb-4 flex-grow text-justify">
-            {formatContent(content.content)}
-          </p> */}
           <div className="flex justify-between items-center">
             <a
               href={node.source}
@@ -409,6 +394,14 @@ export default function SearchResultsPage() {
   };
 
   const renderContentTabs = () => {
+    const getCategoryCount = (filter: string) => {
+      if (!searchResults) return 0;
+      return filter === "all"
+        ? searchResults.response.length
+        : searchResults.response.filter((content) =>
+            content.doc_type.toLowerCase().includes(filter.toLowerCase())
+          ).length;
+    };
     return (
       <Tabs
         defaultValue="all"
@@ -417,20 +410,32 @@ export default function SearchResultsPage() {
         <div className="my-1">
           <TabsList className="flex flex-wrap gap-2 md:gap-4 w-full bg-transparent items-start">
             {[
-              { value: "all", label: "All" },
-              { value: "sec", label: "SEC Filing" },
-              { value: "industry", label: "Industry Reports" },
-              { value: "ir", label: "IR Page" },
-              { value: "earnings", label: "Earnings Call" },
-              { value: "press", label: "Press" },
-              { value: "uploadedDocument", label: "Uploaded Document" },
+              { value: "all", label: "All", filter: "all" },
+              { value: "sec", label: "SEC Filing", filter: "SEC Filing" },
+              {
+                value: "industry",
+                label: "Industry Reports",
+                filter: "Industry Report",
+              },
+              { value: "ir", label: "IR Page", filter: "IR Page" },
+              {
+                value: "earnings",
+                label: "Earnings Call",
+                filter: "Earnings Call",
+              },
+              { value: "press", label: "Press", filter: "Press" },
+              {
+                value: "uploadedDocument",
+                label: "Uploaded Document",
+                filter: "Uploaded Document",
+              },
             ].map((tab) => (
               <TabsTrigger
                 key={tab.value}
                 value={tab.value}
                 className="border px-4 py-2 font-normal text-xs rounded-md bg-[#F3F4F6] hover:bg-gray-100 hover:text-gray-900 transition-colors data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm text-[#384250]"
               >
-                {tab.label}
+                {tab.label} ({getCategoryCount(tab.filter)})
               </TabsTrigger>
             ))}
           </TabsList>
@@ -453,81 +458,60 @@ export default function SearchResultsPage() {
     );
   };
 
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast({
+        title: "Link copied",
+        description: "The URL has been copied to your clipboard",
+        duration: 3000,
+      });
+    } catch (err) {
+      toast({
+        title: "Failed to copy",
+        description: "Could not copy the URL to your clipboard",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+
   return (
     <div className="container mx-auto p-6 max-w-screen-2xl relative">
-      <div className="flex flex-col space-y-6 md:space-y-0 md:flex-row md:items-center justify-between mb-6 mt-4">
-        <div className="flex flex-col w-full space-y-4 md:space-y-0 md:flex-row md:items-center md:space-x-4">
-          <div className="flex-1 max-w-2xl relative">
-            <SearchIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search"
-              value={currentQuery}
-              onChange={(e) => setCurrentQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-2 rounded-xl border border-[#E5E7EB] focus:outline-none focus:ring-2 focus:ring-purple-100 focus:border-purple-400 text-gray-700 placeholder-gray-500 text-base bg-white"
-            />
-          </div>
-          <div className="flex justify-center">
-            <button
-              onClick={() =>
-                handleSearch(currentQuery, searchFiles?.split(",") ?? [])
-              }
-              disabled={isLoading}
-              className="h-10 px-8 py-2 rounded-md font-medium text-white transition-all disabled:opacity-50 bg-[#7F56D9] hover:bg-[#6941C6]"
-            >
-              {isLoading ? (
-                <div className="flex items-center justify-center">
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  <span>Loading...</span>
-                </div>
-              ) : (
-                "Search"
-              )}
-            </button>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="default" className="h-10 gap-2">
-              <Image
-                src="/icons/Excel.svg"
-                alt="excel"
-                width={20}
-                height={20}
-                className="object-contain"
-              />
-              Export
-            </Button>
-            <Button
-              size="default"
-              className="h-10 gap-2 bg-[#7C3AED] hover:bg-[#6D28D9]"
-            >
-              <Image
-                src="/icons/Share.svg"
-                alt="share"
-                width={20}
-                height={20}
-                className="object-contain"
-                style={{ filter: "brightness(0) invert(1)" }}
-              />
-              Share
-            </Button>
-          </div>
+      <div className="flex justify-between mb-6 mt-4">
+        <div className="flex items-center gap-5">
+          <h2 className="text-lg font-normal">
+            Search Result for:{" "}
+            <span className="font-medium">{currentQuery}</span>
+          </h2>
         </div>
-      </div>
-
-      <div className="md:mx-5 flex items-center gap-5 my-5">
-        <h2 className="text-lg font-normal">
-          Search Result for: <span className="font-medium">{currentQuery}</span>
-        </h2>
-        {/* <Button
-          variant="outline"
-          className="flex items-center gap-2 rounded-full bg-white w-full sm:w-auto"
-          onClick={handleAiSummarize}
-        >
-          <Image src={Stars} alt="stars" className="w-6 h-6 object-contain" />
-          <span className="bg-custom-gradient bg-clip-text text-transparent">
-            AI Summarize
-          </span>
-        </Button> */}
+        <div className="flex space-x-4">
+          <Button variant="outline" size="default" className="h-10 gap-2">
+            <Image
+              src="/icons/Excel.svg"
+              alt="excel"
+              width={20}
+              height={20}
+              className="object-contain"
+            />
+            Export
+          </Button>
+          <Button
+            size="default"
+            className="h-10 gap-2 bg-[#7C3AED] hover:bg-[#6D28D9]"
+            onClick={handleShare}
+          >
+            <Image
+              src="/icons/Share.svg"
+              alt="share"
+              width={20}
+              height={20}
+              className="object-contain"
+              style={{ filter: "brightness(0) invert(1)" }}
+            />
+            Share
+          </Button>
+        </div>
       </div>
 
       {error && (
