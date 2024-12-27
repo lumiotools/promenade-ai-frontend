@@ -18,6 +18,7 @@ import rehypeRaw from "rehype-raw";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "../ui/use-toast";
+import calender from "../../public/icons/calendar-icon.svg";
 
 export interface Node {
   content: string;
@@ -48,15 +49,15 @@ interface ApiResponse {
 const getTagColor = (docType: string): string => {
   switch (docType) {
     case "SEC Filing":
-      return "bg-green-100 text-green-800";
+      return "bg-[#ECFDF3] border border-[#ABEFC6] text-[#067647]";
     case "Industry Report":
-      return "bg-orange-100 text-orange-800";
+      return "bg-[#FFFAEB] text-[#F79D09] border border-[#FEE689]";
     case "IR Page":
-      return "bg-blue-100 text-blue-800";
+      return "bg-[#F0F9FF] text-[#026AA2] border border-[#B9E6FE]";
     case "Earnings Call":
-      return "bg-cyan-100 text-cyan-800";
+      return "bg-[#F0F9FF] text-[#026AA2] border border-[#B9E6FE]";
     case "Press":
-      return "bg-purple-100 text-purple-800";
+      return "bg-[#F4F3FF] text-[#5925DC] border border-[#D9D6FE]";
     case "Uploaded Document":
       return "bg-pink-100 text-pink-800";
     default:
@@ -70,17 +71,20 @@ export default function SearchResultsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAiSummary] = useState(true);
-  const [expandedSections, setExpandedSections] = useState({
-    valid: false,
-    invalid: false,
-  });
+  const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
 
-  console.log("Line 78 - searchResults",searchResults)
+  console.log("Line 78 - searchResults", searchResults);
 
   const searchQuery = useSearchParams().get("query");
   const searchFiles = useSearchParams().get("files");
   const router = useRouter();
+
+  const currentDate = new Date().toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 
   useEffect(() => {
     if (searchQuery) {
@@ -124,7 +128,7 @@ export default function SearchResultsPage() {
       }
 
       setSearchResults(data);
-      setExpandedSections({ valid: false, invalid: false });
+      setIsExpanded(false);
     } catch (err) {
       console.error("Search error:", err);
       setSearchResults(null);
@@ -198,20 +202,106 @@ export default function SearchResultsPage() {
     );
   };
 
+  // const renderSourceList = (
+  //   sources: Source[],
+  //   title: string,
+  // ) => {
+  //   console.log("Line 138 - Sources", sources);
+
+  //   const docTypes = Array.from(
+  //     new Set(sources?.map((source) => source.doc_type))
+  //   );
+
+  //   const visibleDocTypes = isExpanded ? docTypes : docTypes.slice(0, 1);
+  //   const hiddenDocTypesCount = docTypes.length - 1;
+
+  //   return (
+  //     <Card className="bg-white rounded-lg shadow-sm h-full flex flex-col">
+  //       <CardHeader className="border-b p-2">
+  //         <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+  //       </CardHeader>
+  //       <CardContent className="p-2 flex-grow overflow-auto">
+  //         {visibleDocTypes.map((docType, docTypeIndex) => {
+  //           const docTypeSources = sources.filter(
+  //             (s) => s.doc_type === docType
+  //           );
+  //           const visibleSources = isExpanded
+  //             ? docTypeSources
+  //             : docTypeSources.slice(0, 4);
+  //           const hiddenSourcesCount = docTypeSources.length - 4;
+
+  //           return (
+  //             <div key={docType} className="mb-4 last:mb-0">
+  //               <h4 className="text-sm font-medium text-gray-900 mb-3">
+  //                 {docType} ({docTypeSources.length})
+  //               </h4>
+  //               <div className="grid grid-cols-2 gap-3">
+  //                 {visibleSources.map((source, index) => (
+  //                   <a
+  //                     key={index}
+  //                     href={source.url}
+  //                     target="_blank"
+  //                     rel="noopener noreferrer"
+  //                     className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-50 transition-colors"
+  //                   >
+  //                     <Globe className="w-4 h-4 text-gray-500 flex-shrink-0" />
+  //                     <span className="text-xs text-gray-600 truncate font-normal">
+  //                       {source.title}
+  //                     </span>
+  //                   </a>
+  //                 ))}
+  //               </div>
+  //               {!isExpanded &&
+  //                 docTypeIndex === 0 &&
+  //                 hiddenSourcesCount > 0 && (
+  //                   <div className="text-sm text-gray-500 mt-2">
+  //                     +{hiddenSourcesCount} more
+  //                   </div>
+  //                 )}
+  //             </div>
+  //           );
+  //         })}
+
+  //         {!isExpanded && hiddenDocTypesCount > 0 && (
+  //           <button
+  //             onClick={() => setIsExpanded(true)}
+  //             className="text-sm text-gray-500 mt-2 hover:text-gray-700"
+  //           >
+  //             +{hiddenDocTypesCount} more
+  //           </button>
+  //         )}
+
+  //         {isExpanded && (
+  //           <button
+  //             onClick={() => setIsExpanded(false)}
+  //             className="text-sm text-gray-500 mt-4 hover:text-gray-700"
+  //           >
+  //             Show less
+  //           </button>
+  //         )}
+  //       </CardContent>
+  //     </Card>
+  //   );
+  // };
+
   const renderSourceList = (
     sources: Source[],
     title: string,
     type: "valid" | "invalid"
   ) => {
-    console.log("Line 138 - Sources",sources)
-
-    const docTypes = Array.from(
-      new Set(sources?.map((source) => source.doc_type))
+    console.log(
+      `${type.charAt(0).toUpperCase() + type.slice(1)} Sources:`,
+      sources
     );
 
-    const isExpanded = expandedSections[type];
-    const visibleDocTypes = isExpanded ? docTypes : docTypes.slice(0, 1);
-    const hiddenDocTypesCount = docTypes.length - 1;
+    const docTypes = Array.from(
+      new Set(sources.map((source) => source.doc_type))
+    );
+    const totalSources = sources.length;
+
+    const visibleDocTypes = isExpanded ? docTypes : [docTypes[0]];
+    const initialVisibleCount = 3;
+    let shownSources = 0;
 
     return (
       <Card className="bg-white rounded-lg shadow-sm h-full flex flex-col">
@@ -219,14 +309,15 @@ export default function SearchResultsPage() {
           <CardTitle className="text-lg font-semibold">{title}</CardTitle>
         </CardHeader>
         <CardContent className="p-2 flex-grow overflow-auto">
-          {visibleDocTypes.map((docType, docTypeIndex) => {
+          {visibleDocTypes.map((docType) => {
             const docTypeSources = sources.filter(
               (s) => s.doc_type === docType
             );
             const visibleSources = isExpanded
               ? docTypeSources
-              : docTypeSources.slice(0, 4);
-            const hiddenSourcesCount = docTypeSources.length - 4;
+              : docTypeSources.slice(0, initialVisibleCount - shownSources);
+
+            shownSources += visibleSources.length;
 
             return (
               <div key={docType} className="mb-4 last:mb-0">
@@ -249,39 +340,23 @@ export default function SearchResultsPage() {
                     </a>
                   ))}
                 </div>
-                {!isExpanded &&
-                  docTypeIndex === 0 &&
-                  hiddenSourcesCount > 0 && (
-                    <div className="text-sm text-gray-500 mt-2">
-                      +{hiddenSourcesCount} more
-                    </div>
-                  )}
               </div>
             );
           })}
 
-          {!isExpanded && hiddenDocTypesCount > 0 && (
+          {!isExpanded && totalSources > initialVisibleCount && (
             <button
-              onClick={() =>
-                setExpandedSections((prev) => ({
-                  ...prev,
-                  [type]: true,
-                }))
-              }
+              onClick={() => setIsExpanded(true)}
               className="text-sm text-gray-500 mt-2 hover:text-gray-700"
             >
-              +{hiddenDocTypesCount} more
+              +{totalSources - initialVisibleCount} more source
+              {totalSources - initialVisibleCount !== 1 ? "s" : ""}
             </button>
           )}
 
           {isExpanded && (
             <button
-              onClick={() =>
-                setExpandedSections((prev) => ({
-                  ...prev,
-                  [type]: false,
-                }))
-              }
+              onClick={() => setIsExpanded(false)}
               className="text-sm text-gray-500 mt-4 hover:text-gray-700"
             >
               Show less
@@ -478,12 +553,21 @@ export default function SearchResultsPage() {
 
   return (
     <div className="container mx-auto p-6 max-w-screen-2xl relative">
-      <div className="flex justify-between mb-6 mt-4">
-        <div className="flex items-center gap-5">
-          <h2 className="text-lg font-normal">
-            Search Result for:{" "}
-            <span className="font-medium">{currentQuery}</span>
-          </h2>
+      <div className="flex justify-between items-end mb-6 mt-4">
+        <div className="flex flex-col items-start gap-2">
+          <h1 className="text-xl font-semibold text-[#182230]">
+            Search Results For: &quot;{currentQuery}&quot;
+          </h1>
+          <div className="flex flex-row gap-2 items-end">
+            <Image
+              src={calender}
+              alt="calender"
+              className="w-5 h-5 object-contain"
+            ></Image>
+            <p className="text-[11px] font-medium text-[#1F2A37]">
+              As of {currentDate}
+            </p>
+          </div>
         </div>
         <div className="flex space-x-4">
           <Button variant="outline" size="default" className="h-10 gap-2">
