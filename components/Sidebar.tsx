@@ -121,7 +121,7 @@ export function AppSidebar() {
         </div>
 
         {/* Search List */}
-        <nav className="flex-1 overflow-y-auto px-2 space-y-1">
+        <nav className="scrollbar-dark-sm flex-1 overflow-y-auto px-2 space-y-1">
           {filteredSearches.map((query, index) => (
             <button
               key={index}
