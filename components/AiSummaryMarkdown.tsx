@@ -37,8 +37,11 @@ export function AiSummaryMarkdown({ summary }: { summary: string }) {
       <Card className="w-full bg-white shadow-sm rounded-lg overflow-hidden mt-4">
         <CardContent className="p-6">
           <div className="prose prose-sm max-w-none">
+            <h3 className="font-medium">
+            Search Results Summary
+            </h3>
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {"## Search Results Summary\n" + summary}
+              {summary}
             </ReactMarkdown>
           </div>
         </CardContent>
