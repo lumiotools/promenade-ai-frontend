@@ -4,6 +4,7 @@ import "./globals.css";
 import { AppSidebar } from "@/components/Sidebar";
 import { Metadata } from "next";
 import { Suspense } from "react";
+import { Toaster } from "./ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -38,6 +39,7 @@ export default function RootLayout({
               <AppSidebar />
               <main className="flex-1 overflow-auto ml-0 md:ml-64 bg-white h-full">
                 {children}
+                <Toaster />
               </main>
             </div>
           </SearchProvider>
