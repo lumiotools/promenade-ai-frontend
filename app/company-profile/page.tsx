@@ -10,6 +10,13 @@ import { LatestActivities } from "@/components/LatestActivities";
 import { KeyPeople } from "@/components/KeyPeople";
 import { fetchCompanyData, CompanyData } from "@/lib/dummyApi";
 import { InfoGrid } from "@/components/company-info-grid";
+import { LoadingIndicator } from "@/components/LoadingIndicator";
+import { CompanyHeaderSkeleton } from "@/components/Skeleton/CompanyHeader";
+import { InfoGridSkeleton } from "@/components/Skeleton/company-info-grid";
+import { StrategyCardSkeleton } from "@/components/Skeleton/StrategyCard";
+import { KeyPerformanceIndicatorsSkeleton } from "@/components/Skeleton/KeyPerformanceIndicators";
+import { LatestActivitiesSkeleton } from "@/components/Skeleton/LatestActivities";
+import { KeyPeopleSkeleton } from "@/components/Skeleton/KeyPeople";
 import { LoadingCard } from "@/components/LoadingCard";
 
 export default function CompanyProfile() {
@@ -36,18 +43,7 @@ export default function CompanyProfile() {
     router.push("/");
   }, [router]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB]">
-        <LoadingCard
-          companyName={companyData?.name || "Company"}
-          onBack={handleBack}
-        />
-      </div>
-    );
-  }
-
-  if (!companyData) {
+  if (!companyData && !isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB]">
         <div className="bg-white rounded-2xl p-8 shadow-lg border text-center">
@@ -70,22 +66,57 @@ export default function CompanyProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
+    <div className="min-h-screen bg-[#F9FAFB] relative">
       <TopNav />
       <div className="container mx-auto px-4 py-8">
-        <CompanyHeader companyData={companyData} />
-        <InfoGrid companyData={companyData} />
-        <StrategyCard
-          sources={Object.values(companyData.sources_StrategyCard)}
-          strategy={companyData.strategy}
-        />
-        <KeyPerformanceIndicators
-          sources={Object.values(companyData.sources_KeyPerformanceIndicators)}
-          kpi={companyData.kpi}
-        />
-        <LatestActivities activities={companyData.activities} />
-        <KeyPeople people={companyData.keyPeople} />
+        {isLoading ? (
+          <CompanyHeaderSkeleton />
+        ) : (
+          <CompanyHeader companyData={companyData!} />
+        )}
+        {isLoading ? (
+          <InfoGridSkeleton />
+        ) : (
+          <InfoGrid companyData={companyData!} />
+        )}
+        {isLoading ? (
+          <StrategyCardSkeleton />
+        ) : (
+          <StrategyCard
+            sources={Object.values(companyData!.sources_StrategyCard)}
+            strategy={companyData!.strategy}
+          />
+        )}
+        {isLoading ? (
+          <KeyPerformanceIndicatorsSkeleton />
+        ) : (
+          <KeyPerformanceIndicators
+            sources={Object.values(
+              companyData!.sources_KeyPerformanceIndicators
+            )}
+            kpi={companyData!.kpi}
+          />
+        )}
+        {isLoading ? (
+          <LatestActivitiesSkeleton />
+        ) : (
+          <LatestActivities activities={companyData!.activities} />
+        )}
+        {isLoading ? (
+          <KeyPeopleSkeleton />
+        ) : (
+          <KeyPeople people={companyData!.keyPeople} />
+        )}
       </div>
+
+      {isLoading && (
+        <div className="absolute w-full h-screen top-0 left-0 flex justify-center items-center backdrop-blur-sm">
+          <LoadingCard
+            companyName={companyData?.name || ""}
+            onBack={() => router.push("/")}
+          />
+        </div>
+      )}
     </div>
   );
 }

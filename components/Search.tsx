@@ -8,9 +8,9 @@ import {
   Telescope,
   Building2,
   Paperclip,
-  File,
   FileText,
   X,
+  Eye,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
@@ -22,6 +22,10 @@ import { ValueChainModal } from "../components/ValueChainModal";
 import { MarketingMapModal } from "../components/MarketingMapModal";
 import { LoadingCard } from "../components/LoadingCard";
 import { SearchResult } from "@/types/search";
+import { BusinessEvolutionModal } from "../components/BusinessEvolutionModal";
+import { FindProductModal } from "../components/FindProductModal";
+import BusinessEvolutionIcon from "../public/icons/Business Evolution Icon.svg";
+import MarketSizeIcon from "../public/icons/Market size Icon.svg";
 
 interface SearchPageProps {
   currentQuery: string;
@@ -36,7 +40,13 @@ export default function SearchPage({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeModal, setActiveModal] = useState<
-    "companyProfile" | "marketingTrends" | "valueChain" | "marketingMap" | null
+    | "companyProfile"
+    | "marketingTrends"
+    | "valueChain"
+    | "marketingMap"
+    | "businessEvolution"
+    | "findProduct"
+    | null
   >(null);
   const router = useRouter();
 
@@ -70,14 +80,17 @@ export default function SearchPage({
         files.forEach((file) => {
           formData.append("file", file);
         });
-        
-        formData.append("user_id","test")
+
+        formData.append("user_id", "test");
 
         const response = await (
-          await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/search/upload_files`, {
-            method: "POST",
-            body: formData,
-          })
+          await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_URL}/api/search/upload_files`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          )
         ).json();
 
         if (!response.success) {
@@ -88,7 +101,9 @@ export default function SearchPage({
           throw new Error("No files uploaded");
         }
 
-        searchUrl += `&files=${encodeURIComponent(response.data.files.join(","))}`;
+        searchUrl += `&files=${encodeURIComponent(
+          response.data.files.join(",")
+        )}`;
       }
       setIsUploading(false);
       router.push(searchUrl);
@@ -117,6 +132,8 @@ export default function SearchPage({
       | "marketingTrends"
       | "valueChain"
       | "marketingMap"
+      | "businessEvolution"
+      | "findProduct"
   ) => {
     setActiveModal(modalType);
   };
@@ -129,7 +146,7 @@ export default function SearchPage({
     <div className="relative min-h-screen flex flex-col items-end justify-end">
       <div
         className={cn(
-          "flex-grow flex flex-col items-end justify-end p-4 mb-16 md:mt-0 transition-all duration-200",
+          "flex-grow flex flex-col items-end justify-end p-4 mb-5 md:mt-0 transition-all duration-200",
           (activeModal !== null || isLoading) &&
             "blur-[2px] pointer-events-none"
         )}
@@ -213,9 +230,9 @@ export default function SearchPage({
             <div></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
             <div
-              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative"
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-[280px]"
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpenModal("marketingTrends");
@@ -226,22 +243,26 @@ export default function SearchPage({
                   <Telescope className="w-5 h-5" />
                 </div>
                 <button
-                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg"
+                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg border border-[#C4B1EE]"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleOpenModal("marketingTrends");
                   }}
                 >
+                  <Eye className="w-3 h-4 object-contain"></Eye>
                   See Preview
                 </button>
               </div>
-              <h3 className="font-semibold mb-2 text-base">Marketing Trends</h3>
+              <h3 className="font-semibold mb-2 text-[14px]">
+                Competitive Landscape
+              </h3>
               <p className="text-sm text-gray-600 w-full">
                 Get a comprehensive overview of key competitors
               </p>
             </div>
+
             <div
-              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative"
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-[280px]"
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpenModal("companyProfile");
@@ -252,22 +273,26 @@ export default function SearchPage({
                   <Building2 className="w-5 h-5" />
                 </div>
                 <button
-                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg"
+                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg border border-[#C4B1EE]"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleOpenModal("companyProfile");
                   }}
                 >
+                  <Eye className="w-3 h-4 object-contain"></Eye>
                   See Preview
                 </button>
               </div>
-              <h3 className="font-semibold mb-2">Company Profile</h3>
-              <p className="text-sm text-gray-600">
-                Get a quick snapshot of a company
+              <h3 className="font-semibold mb-2 text-[14px]">
+                Company Profile
+              </h3>
+              <p className="text-sm text-gray-600 font-normal">
+                Get an analyst summary of private and public companies
               </p>
             </div>
+
             <div
-              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative"
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-[280px]"
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpenModal("valueChain");
@@ -282,22 +307,24 @@ export default function SearchPage({
                   />
                 </div>
                 <button
-                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg"
+                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg border border-[#C4B1EE]"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleOpenModal("valueChain");
                   }}
                 >
+                  <Eye className="w-3 h-4 object-contain"></Eye>
                   See Preview
                 </button>
               </div>
-              <h3 className="font-semibold mb-2">Value Chain</h3>
+              <h3 className="font-semibold mb-2 text-[14px]">Value Chain</h3>
               <p className="text-sm text-gray-600">
                 Analyze an end-to-end industry/segment value chain
               </p>
             </div>
+
             <div
-              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative"
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-[280px]"
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpenModal("marketingMap");
@@ -312,18 +339,89 @@ export default function SearchPage({
                   />
                 </div>
                 <button
-                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg"
+                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg border border-[#C4B1EE]"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleOpenModal("marketingMap");
                   }}
                 >
+                  <Eye className="w-3 h-4 object-contain"></Eye>
                   See Preview
                 </button>
               </div>
-              <h3 className="font-semibold mb-2">Marketing Map</h3>
+              <h3 className="font-semibold mb-2 text-[14px]">Marketing Map</h3>
               <p className="text-sm text-gray-600">
                 Get a detailed breakdown of market segments
+              </p>
+            </div>
+
+            <div
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-[280px]"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenModal("businessEvolution");
+              }}
+            >
+              <div className="relative flex justify-between items-start mb-2">
+                <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px]">
+                  <Image
+                    src={BusinessEvolutionIcon}
+                    alt="Marketing Map"
+                    className="w-5 h-5"
+                  />
+                </div>
+                <button
+                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg border border-[#C4B1EE]"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenModal("businessEvolution");
+                  }}
+                >
+                  <Eye className="w-3 h-4 object-contain"></Eye>
+                  See Preview
+                </button>
+              </div>
+              <h3 className="font-semibold mb-2 text-[14px]">
+                Business Evolution
+              </h3>
+              <p className="text-sm text-gray-600">
+                Track and compare the business evolution of two or more
+                companies over time
+              </p>
+            </div>
+
+            <div
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-[280px]"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenModal("findProduct");
+              }}
+            >
+              <div className="relative flex justify-between items-start mb-2">
+                <div className="border rounded-md flex items-center justify-center w-[40px] h-[40px]">
+                  <Image
+                    src={MarketSizeIcon}
+                    alt="Marketing Map"
+                    className="w-5 h-5"
+                  />
+                </div>
+                <button
+                  className="absolute top-[-5px] right-[-5px] hover:text-purple-700 text-xs flex items-center gap-1 bg-[#F2EEFB] py-1 px-2 text-[#333333] rounded-lg border border-[#C4B1EE]"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenModal("findProduct");
+                  }}
+                >
+                  <Eye className="w-3 h-4 object-contain"></Eye>
+                  See Preview
+                </button>
+              </div>
+              <h3 className="font-semibold mb-2 text-[14px]">
+                Find Product & Service
+              </h3>
+              <p className="text-sm text-gray-600">
+                Quickly grasp views on the overall size and growth potential of
+                the market
               </p>
             </div>
           </div>
@@ -361,6 +459,20 @@ export default function SearchPage({
           )}
           {activeModal === "marketingMap" && (
             <MarketingMapModal
+              isOpen={true}
+              onClose={handleCloseModal}
+              onSubmit={handleModalSubmit}
+            />
+          )}
+          {activeModal === "businessEvolution" && (
+            <BusinessEvolutionModal
+              isOpen={true}
+              onClose={handleCloseModal}
+              onSubmit={handleModalSubmit}
+            />
+          )}
+          {activeModal === "findProduct" && (
+            <FindProductModal
               isOpen={true}
               onClose={handleCloseModal}
               onSubmit={handleModalSubmit}
