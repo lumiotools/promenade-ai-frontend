@@ -68,11 +68,13 @@ export default function SearchPage({
       if (files.length > 0) {
         const formData = new FormData();
         files.forEach((file) => {
-          formData.append("files", file);
+          formData.append("file", file);
         });
+        
+        formData.append("user_id","test")
 
         const response = await (
-          await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/upload_files`, {
+          await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/api/search/upload_files`, {
             method: "POST",
             body: formData,
           })
@@ -82,11 +84,11 @@ export default function SearchPage({
           throw new Error("Failed to upload files");
         }
 
-        if (response.files.length === 0) {
+        if (response.data.files.length === 0) {
           throw new Error("No files uploaded");
         }
 
-        searchUrl += `&files=${encodeURIComponent(response.files.join(","))}`;
+        searchUrl += `&files=${encodeURIComponent(response.data.files.join(","))}`;
       }
       setIsUploading(false);
       router.push(searchUrl);

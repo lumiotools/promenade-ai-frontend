@@ -1,78 +1,66 @@
 "use client";
 
 import * as React from "react";
-import { useContext } from "react";
-import { useRouter } from "next/navigation";
-import { Menu, Search, Upload, Globe, FileText } from "lucide-react";
-import { SearchContext } from "@/app/search-context";
+import { Globe, Menu, Search, Upload } from "lucide-react";
 import Image from "next/image";
 import logo from "../public/images/promenade logo.svg";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-// Dummy data for testing
-const DUMMY_SEARCHES = [
-  "www.tesla.com",
-  "chubb.com",
-  "chubb.com",
-  "www.apple.com",
-  "GenZ",
-  "Defence Industry",
-  "www.matracon.com",
-  "www.qualcomm.com",
-  "OTT Industry",
-  "OTT Industry",
-  "Netflix.com",
-  "Netflix.com",
-  "Contents Industry",
-  "ECG Strategy",
-  "Private Equity Deal Soup",
-  "CRM for Venture Capital",
-  "salesforce.com",
-  "P&C Insurance in the next decade",
-  "P&C Insurance in the next decade",
-  "P&C Insurance in the next decade",
-];
+interface searchHistory {
+  id: string;
+  query: string;
+}
 
 export function AppSidebar() {
-  const { setCurrentQuery, getSearchResult } = useContext(SearchContext);
-  const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
-  const [searchHistory, setSearchHistory] = React.useState("");
+  const [searchHistory, setSearchHistory] = React.useState<searchHistory[]>([]);
+  const [loading, setLoading] = React.useState(false);
+  const [filterQuery, setFilterQuery] = React.useState("");
   const [filteredSearches, setFilteredSearches] =
-    React.useState(DUMMY_SEARCHES);
+    React.useState<searchHistory[]>(searchHistory);
+    
+  const pathname=usePathname();
 
-  const handleNewSearch = () => {
-    setCurrentQuery("");
-    router.push("/");
-    setIsOpen(false);
-  };
+  const fetchSearchHistory = async () => {
+    try {
+      setLoading(true);
 
-  const handleSearchClick = (query: string) => {
-    setCurrentQuery(query);
-    const result = getSearchResult(query);
-    if (result) {
-      // localStorage.setItem("currentSearchResult", JSON.stringify(result));
+      const response = await (
+        await fetch(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/search/user?user_id=test`
+        )
+      ).json();
+
+      if (!response.success) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = response.data;
+
+      if (!data) {
+        throw new Error("Invalid response data");
+      }
+
+      setSearchHistory(data);
+    } catch (error) {
+      setLoading(false);
     }
-    router.push("/search");
-    setIsOpen(false);
   };
 
-  // Filter searches based on search history input
   React.useEffect(() => {
-    const filtered = DUMMY_SEARCHES.filter((query) =>
-      query.toLowerCase().includes(searchHistory.toLowerCase())
-    );
-    setFilteredSearches(filtered);
-  }, [searchHistory]);
+    fetchSearchHistory();
+  }, [pathname]);
 
-  // Function to determine icon based on the search query
-  const getQueryIcon = (query: string) => {
-    if (query.includes(".com")) {
-      return <Globe className="h-4 w-4 text-gray-400" />;
-    }
-    return <FileText className="h-4 w-4 text-gray-400" />;
-  };
+  React.useEffect(() => {
+    setFilteredSearches(
+      searchHistory.filter(({ query }) =>
+        query.toLowerCase().includes(filterQuery.toLowerCase())
+      )
+    );
+  }, [searchHistory, filterQuery]);
 
   return (
     <>
@@ -90,30 +78,37 @@ export function AppSidebar() {
         {/* Header */}
         <div className="p-4 space-y-4">
           <div className="flex items-center justify-center gap-2 mt-5">
-            <Image src={logo} alt="Promenade" width={140} height={140} className="object-cover"/>
+            <Image
+              src={logo}
+              alt="Promenade"
+              width={140}
+              height={140}
+              className="object-cover mb-3"
+            />
           </div>
 
           {/* New Search Button */}
-          <button
-            onClick={handleNewSearch}
-            className="text-black w-full h-10 rounded-full font-medium flex items-center justify-center gap-2 transition-all"
-            style={{
-              background:
-                "linear-gradient(91.93deg, #F8F5B1 2.3%, #C6A1FD 35.25%, #89FDD6 66.76%, #9294F0 97.79%)",
-            }}
-          >
-            <div className="flex items-center justify-center w-full gap-2 text-center">
-              <span className="text-4xl font-light text-center mb-2">+</span>
-              <span className="text-base font-semibold">New</span>
-            </div>
-          </button>
+          <Link href="/">
+            <button
+              className="text-black w-full h-10 rounded-full font-medium flex items-center justify-center gap-2 transition-all hover:opacity-95"
+              style={{
+                background:
+                  "linear-gradient(91.93deg, #F8F5B1 2.3%, #C6A1FD 35.25%, #89FDD6 66.76%, #9294F0 97.79%)",
+              }}
+            >
+              <div className="flex items-center justify-center w-full gap-2 text-center">
+                <span className="text-3xl font-light text-center mb-1">+</span>
+                <span className="text-base font-semibold">New</span>
+              </div>
+            </button>
+          </Link>
 
           {/* Search History Input */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-300" />
             <Input
-              value={searchHistory}
-              onChange={(e) => setSearchHistory(e.target.value)}
+              value={filterQuery}
+              onChange={(e) => setFilterQuery(e.target.value)}
               placeholder="Search History"
               className=" outline-none w-full bg-[#1C1C1C] pl-10 text-sm text-gray-300 placeholder:text-gray-400 border border-[#38383A]"
             />
@@ -122,15 +117,15 @@ export function AppSidebar() {
 
         {/* Search List */}
         <nav className="scrollbar-dark-sm flex-1 overflow-y-auto px-2 space-y-1">
-          {filteredSearches.map((query, index) => (
-            <button
+          {filteredSearches.map(({ query, id }, index) => (
+            <Link
+              href={`/search/${id}`}
               key={index}
-              onClick={() => handleSearchClick(query)}
               className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-[#1C1C1C] rounded-lg transition-colors group"
             >
-              {getQueryIcon(query)}
+              <Globe className="w-4"></Globe>
               <span className="flex-1 text-left truncate">{query}</span>
-            </button>
+            </Link>
           ))}
         </nav>
 
