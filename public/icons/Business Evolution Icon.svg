@@ -1,0 +1,38 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_557_6147)">
+<path d="M4.89478 11.5789L3.00004 11.5789" stroke="#384250" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M21 11.5789L19.1053 11.5789" stroke="#384250" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M8.68433 11.5789L7.73696 11.5789" stroke="#384250" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M12.4736 11.5789L11.5263 11.5789" stroke="#384250" stroke-width="1.2" stroke-linecap="round"/>
+<path d="M16.2632 11.5789L15.3158 11.5789" stroke="#384250" stroke-width="1.2" stroke-linecap="round"/>
+<mask id="path-6-inside-1_557_6147" fill="white">
+<rect x="4.42163" y="14.4212" width="3.78947" height="4.73684" rx="1"/>
+</mask>
+<rect x="4.42163" y="14.4212" width="3.78947" height="4.73684" rx="1" stroke="#384250" stroke-width="2.4" stroke-linejoin="round" mask="url(#path-6-inside-1_557_6147)"/>
+<path d="M6.31616 14.8949L6.31616 12.5265" stroke="#384250" stroke-width="1.2"/>
+<circle cx="6.31602" cy="11.5792" r="0.947368" stroke="#384250" stroke-width="1.2"/>
+<mask id="path-9-inside-2_557_6147" fill="white">
+<rect x="19.5784" y="8.73703" width="3.78947" height="4.73684" rx="1" transform="rotate(180 19.5784 8.73703)"/>
+</mask>
+<rect x="19.5784" y="8.73703" width="3.78947" height="4.73684" rx="1" transform="rotate(180 19.5784 8.73703)" stroke="#384250" stroke-width="2.4" stroke-linejoin="round" mask="url(#path-9-inside-2_557_6147)"/>
+<path d="M17.6838 8.26334L17.6838 10.6318" stroke="#384250" stroke-width="1.2"/>
+<circle cx="17.684" cy="11.5789" r="0.947368" transform="rotate(180 17.684 11.5789)" stroke="#384250" stroke-width="1.2"/>
+<mask id="path-12-inside-3_557_6147" fill="white">
+<rect x="12" y="14.4212" width="3.78947" height="4.73684" rx="1"/>
+</mask>
+<rect x="12" y="14.4212" width="3.78947" height="4.73684" rx="1" stroke="#384250" stroke-width="2.4" stroke-linejoin="round" mask="url(#path-12-inside-3_557_6147)"/>
+<path d="M13.8948 14.8949L13.8948 12.5265" stroke="#384250" stroke-width="1.2"/>
+<circle cx="13.8946" cy="11.5792" r="0.947368" stroke="#384250" stroke-width="1.2"/>
+<mask id="path-15-inside-4_557_6147" fill="white">
+<rect x="12" y="8.73703" width="3.78947" height="4.73684" rx="1" transform="rotate(180 12 8.73703)"/>
+</mask>
+<rect x="12" y="8.73703" width="3.78947" height="4.73684" rx="1" transform="rotate(180 12 8.73703)" stroke="#384250" stroke-width="2.4" stroke-linejoin="round" mask="url(#path-15-inside-4_557_6147)"/>
+<path d="M10.1052 8.26334L10.1052 10.6318" stroke="#384250" stroke-width="1.2"/>
+<circle cx="10.1054" cy="11.5789" r="0.947368" transform="rotate(180 10.1054 11.5789)" stroke="#384250" stroke-width="1.2"/>
+</g>
+<defs>
+<clipPath id="clip0_557_6147">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+</defs>
+</svg>

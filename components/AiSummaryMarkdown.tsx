@@ -14,7 +14,7 @@ export function AiSummaryMarkdown({ summary }: { summary: string }) {
       <div className="relative w-full mb-8">
         <button
           onClick={() => setIsExpanded(true)}
-          className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
+          className="absolute left-1/2 -translate-x-1/2 -translate-y-1 md:-translate-y-8 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
           aria-expanded={false}
           aria-label="Expand summary"
         >
@@ -37,12 +37,8 @@ export function AiSummaryMarkdown({ summary }: { summary: string }) {
       <Card className="w-full bg-white shadow-sm rounded-lg overflow-hidden mt-4">
         <CardContent className="p-6">
           <div className="prose prose-sm max-w-none">
-            <h3 className="font-medium">
-            Search Results Summary
-            </h3>
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {summary}
-            </ReactMarkdown>
+            <h3 className="font-medium">Search Results Summary</h3>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{summary}</ReactMarkdown>
           </div>
         </CardContent>
       </Card>

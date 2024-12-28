@@ -24,7 +24,7 @@ export function MarketingTrendsModal({
   };
 
   return (
-    <div className=" relative inset-0 z-50 flex items-center justify-center bg-white bg-opacity-50">
+    <div className="relative inset-0 z-50 flex items-center justify-center">
       <div className="w-full max-w-[580px] mx-auto bg-white rounded-2xl shadow-xl border">
         <div className="flex items-center gap-3 py-3 px-5 border-b">
           <div className="p-2 border rounded-lg">
@@ -60,12 +60,16 @@ export function MarketingTrendsModal({
           </div>
         </form>
 
-        <div className="border-t p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between bg-gray-50 rounded-b-2xl gap-4 sm:gap-1">
-          <div className="flex items-center justify-between gap-1 text-xs sm:text-sm text-[#4B5563]">
-            <Info className="w-4 h-4 text-gray-400" />
-            <span className="text-[#6B7280]">To perform this action</span>
-            <span className="font-medium text-[#111827]">01 credit</span>
-            <span className="text-[#6B7280]">will be deducted</span>
+        <div className="border-t p-4 sm:p-6 flex flex-col sm:flex-row items-center justify-between bg-gray-50 rounded-b-2xl gap-4 sm:gap-8">
+          <div className="flex items-center gap-1 text-xs sm:text-sm text-[#4B5563]">
+            <Info className="w-3 h-3 text-gray-400" />
+            <span className="text-[#6B7280] text-xs">
+              To perform this action
+            </span>
+            <span className="font-medium text-[#111827] text-xs">
+              01 credit
+            </span>
+            <span className="text-[#6B7280] text-xs">will be deducted</span>
           </div>
           <div className="flex gap-3 w-full sm:w-auto">
             <button
