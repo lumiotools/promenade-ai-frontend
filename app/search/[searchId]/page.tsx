@@ -416,7 +416,7 @@ export default function SearchResultsPage({
         defaultValue="all"
         className="w-full flex flex-col items-start mb-10 md:mt-5"
       >
-        <div className="my-1">
+        <div className="my-1 mt-5">
           <TabsList className="flex flex-wrap gap-2 md:gap-4 w-full bg-transparent items-start">
             {[
               { value: "all", label: "All", filter: "all" },
@@ -459,7 +459,7 @@ export default function SearchResultsPage({
           { value: "press", filter: "Press" },
           { value: "uploadedDocument", filter: "Uploaded Document" },
         ].map((tab) => (
-          <TabsContent key={tab.value} value={tab.value}>
+          <TabsContent key={tab.value} value={tab.value} className="mt-28 md:mt-0">
             {renderFilteredResults(tab.filter)}
           </TabsContent>
         ))}
