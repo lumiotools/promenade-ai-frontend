@@ -27,7 +27,7 @@ export function FindProductModal({
   };
 
   return (
-    <div className="relative inset-0 z-50 flex items-center justify-center bg-white bg-opacity-50">
+    <div className="relative inset-0 z-50 flex items-center justify-center">
       <div className="w-full max-w-[580px] mx-auto bg-white rounded-2xl shadow-xl border">
         <div className="flex items-center gap-3 py-3 px-5 border-b">
           <div className="p-2 border rounded-lg">
