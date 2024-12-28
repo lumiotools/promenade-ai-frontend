@@ -14,8 +14,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import ValueChain from "../public/icons/Value Chain Icon.svg"
-import Birdeye from "../public/icons/Segment Breakdown Icon.svg"
+import ValueChain from "../public/icons/Value Chain Icon.svg";
+import Birdeye from "../public/icons/Segment Breakdown Icon.svg";
 import { CompanyProfileModal } from "../components/CompanyProfileModal";
 import { MarketingTrendsModal } from "../components/MarketingTrendsModal";
 import { ValueChainModal } from "../components/ValueChainModal";
@@ -143,7 +143,7 @@ export default function SearchPage({
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col items-end justify-end">
+    <div className="relative min-h-screen flex flex-col items-end justify-end mb-10 md:mb-0">
       <div
         className={cn(
           "flex-grow flex flex-col items-end justify-end p-4 mb-5 md:mt-0 transition-all duration-200",
@@ -151,7 +151,7 @@ export default function SearchPage({
             "blur-[2px] pointer-events-none"
         )}
       >
-        <div className="w-full max-w-5xl text-center">
+        <div className="w-full max-w-7xl mx-auto text-center px-4">
           <div>
             <p className="text-[#4D5761] font-normal">
               Promenade AI Research Assistant
@@ -163,7 +163,7 @@ export default function SearchPage({
 
           <form
             onSubmit={handleSearch}
-            className="w-full max-w-3xl mx-auto mb-8 flex gap-4"
+            className="w-full max-w-3xl mx-auto mb-8 flex gap-4 px-4"
           >
             <div className="relative flex-1">
               <SearchIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -230,9 +230,9 @@ export default function SearchPage({
             <div></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl mx-auto px-4">
             <div
-              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-[280px]"
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-full"
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpenModal("marketingTrends");
@@ -262,7 +262,7 @@ export default function SearchPage({
             </div>
 
             <div
-              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-[280px]"
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-full"
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpenModal("companyProfile");
@@ -292,7 +292,7 @@ export default function SearchPage({
             </div>
 
             <div
-              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-[280px]"
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-full"
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpenModal("valueChain");
@@ -324,7 +324,7 @@ export default function SearchPage({
             </div>
 
             <div
-              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-[280px]"
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-full"
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpenModal("marketingMap");
@@ -356,7 +356,7 @@ export default function SearchPage({
             </div>
 
             <div
-              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-[280px]"
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-full"
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpenModal("businessEvolution");
@@ -391,7 +391,7 @@ export default function SearchPage({
             </div>
 
             <div
-              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-[280px]"
+              className="p-3 rounded-xl border border-gray-200 text-left cursor-pointer hover:border-purple-200 transition-colors relative w-full"
               onClick={(e) => {
                 e.stopPropagation();
                 handleOpenModal("findProduct");
@@ -435,7 +435,7 @@ export default function SearchPage({
       </div>
 
       {activeModal && (
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/50">
           {activeModal === "marketingTrends" && (
             <MarketingTrendsModal
               isOpen={true}
@@ -482,7 +482,7 @@ export default function SearchPage({
       )}
 
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4 bg-black/50">
           <LoadingCard
             companyName="Nvidia"
             onBack={() => setIsLoading(false)}
