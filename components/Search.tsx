@@ -33,10 +33,8 @@ interface SearchPageProps {
   addSearch: (query: string, result: SearchResult) => void;
 }
 
-export default function SearchPage({
-  currentQuery,
-  setCurrentQuery,
-}: SearchPageProps) {
+export default function SearchPage({}: SearchPageProps) {
+  const [currentQuery, setCurrentQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeModal, setActiveModal] = useState<
