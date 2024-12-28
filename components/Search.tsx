@@ -143,7 +143,7 @@ export default function SearchPage({
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col items-end justify-end">
+    <div className="relative min-h-screen flex flex-col items-end justify-end mb-10 md:mb-0">
       <div
         className={cn(
           "flex-grow flex flex-col items-end justify-end p-4 mb-5 md:mt-0 transition-all duration-200",
