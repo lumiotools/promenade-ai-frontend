@@ -1,42 +1,43 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { Info, X } from "lucide-react";
-import ValueChain from "../public/icons/Value Chain Icon.svg"
+import MarketSizeIcon from "../public/icons/Market size Icon.svg";
 
-interface ValueChainModalProps {
+import Image from "next/image";
+interface FindProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: { industry: string }) => void;
+  onSubmit: (data: { product: string; market: string }) => void;
 }
 
-export function ValueChainModal({
+export function FindProductModal({
   isOpen,
   onClose,
   onSubmit,
-}: ValueChainModalProps) {
-  const [industry, setIndustry] = useState("");
+}: FindProductModalProps) {
+  const [product, setProduct] = useState("");
+  const [market, setMarket] = useState("");
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ industry });
+    onSubmit({ product, market });
   };
 
   return (
-    <div className=" relative inset-0 z-50 flex items-center justify-center bg-white bg-opacity-50">
+    <div className="relative inset-0 z-50 flex items-center justify-center bg-white bg-opacity-50">
       <div className="w-full max-w-[580px] mx-auto bg-white rounded-2xl shadow-xl border">
         <div className="flex items-center gap-3 py-3 px-5 border-b">
           <div className="p-2 border rounded-lg">
-          <Image
-                    src={ValueChain}
-                    alt="Value Chain"
-                    className="w-5 h-5"
-                  />
+            <Image
+              src={MarketSizeIcon}
+              alt="Marketing Map"
+              className="w-5 h-5"
+            />
           </div>
-          <h2 className="text-lg font-medium">Value Chain</h2>
+          <h2 className="text-lg font-medium">Find Product & Service</h2>
           <button
             onClick={onClose}
             className="absolute right-6 top-4 p-1 text-gray-500 hover:text-gray-700 bg-[#F3F4F6] rounded-full"
@@ -50,17 +51,33 @@ export function ValueChainModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="space-y-2">
             <label
-              htmlFor="industry"
+              htmlFor="product"
               className="block text-sm font-medium text-gray-700"
             >
-              Industry
+              Product/Service
             </label>
             <input
               type="text"
-              id="industry"
-              value={industry}
-              onChange={(e) => setIndustry(e.target.value)}
-              placeholder="Enter industry name"
+              id="product"
+              value={product}
+              onChange={(e) => setProduct(e.target.value)}
+              placeholder="Enter product or service name"
+              className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            />
+          </div>
+          <div className="space-y-2">
+            <label
+              htmlFor="market"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Target Market
+            </label>
+            <input
+              type="text"
+              id="market"
+              value={market}
+              onChange={(e) => setMarket(e.target.value)}
+              placeholder="Enter target market"
               className="w-full px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>

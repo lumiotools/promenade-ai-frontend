@@ -50,19 +50,19 @@ interface ApiResponse {
 const getTagColor = (docType: string): string => {
   switch (docType) {
     case "SEC Filing":
-      return "bg-[#ECFDF3] border border-[#ABEFC6] text-[#067647]";
+      return "bg-[#ECFDF3] border border-[#ABEFC6] text-[#067647] hover:bg-[#ECFDF3]";
     case "Industry Report":
-      return "bg-[#FFFAEB] text-[#F79D09] border border-[#FEE689]";
+      return "bg-[#FFFAEB] text-[#F79D09] border border-[#FEE689] hover:bg-[#FFFAEB]";
     case "IR Page":
-      return "bg-[#F0F9FF] text-[#026AA2] border border-[#B9E6FE]";
+      return "bg-[#F0F9FF] text-[#026AA2] border border-[#B9E6FE] hover:bg-[#F0F9FF]";
     case "Earnings Call":
-      return "bg-[#F0F9FF] text-[#026AA2] border border-[#B9E6FE]";
+      return "bg-[#F0F9FF] text-[#026AA2] border border-[#B9E6FE] hover:bg-[#F0F9FF]";
     case "Press":
-      return "bg-[#F4F3FF] text-[#5925DC] border border-[#D9D6FE]";
+      return "bg-[#F4F3FF] text-[#5925DC] border border-[#D9D6FE] hover:bg-[#F4F3FF]";
     case "Uploaded Document":
-      return "bg-pink-100 text-pink-800";
+      return "bg-pink-100 text-pink-800 hover:bg-pink-100";
     default:
-      return "bg-gray-100 text-gray-800";
+      return "bg-gray-100 text-gray-800 hover:bg-gray-100";
   }
 };
 
@@ -122,7 +122,7 @@ export default function SearchResultsPage({
       setSearchResults(data);
       setIsExpanded(false);
     } catch (err) {
-      setError(err.message)
+      setError(err.message);
       console.error("Search error:", err);
       setSearchResults(null);
     } finally {
@@ -218,6 +218,19 @@ export default function SearchResultsPage({
       `${type.charAt(0).toUpperCase() + type.slice(1)} Sources:`,
       sources
     );
+
+    if (sources.length === 0) {
+      return (
+        <Card className="bg-white rounded-lg shadow-sm h-full flex flex-col">
+          <CardHeader className="border-b py-3">
+            <CardTitle className="text-lg font-semibold">{title}</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4 pb-2 flex-grow overflow-auto">
+            <p className="text-sm text-gray-500">Sources are not available</p>
+          </CardContent>
+        </Card>
+      );
+    }
 
     const docTypes = Array.from(new Set(sources.map((source) => source.type)));
     const totalSources = sources.length;
@@ -473,16 +486,12 @@ export default function SearchResultsPage({
   };
 
   return (
-
-    
-
     <div className="container mx-auto p-6 max-w-screen-2xl relative">
-
-{error && (
-            <div className="w-full max-w-3xl mx-auto mb-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
-              {error}
-            </div>
-          )}
+      {error && (
+        <div className="w-full max-w-3xl mx-auto mb-8 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+          {error}
+        </div>
+      )}
 
       {isLoading ? (
         renderSkeletonLoading()

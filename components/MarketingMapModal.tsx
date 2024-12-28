@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Map, X, Info } from "lucide-react";
+import { X, Info } from "lucide-react";
+import Image from "next/image";
+import Birdeye from "../public/icons/Segment Breakdown Icon.svg";
 
 interface MarketingMapModalProps {
   isOpen: boolean;
@@ -28,7 +30,7 @@ export function MarketingMapModal({
       <div className="w-full max-w-[580px] mx-auto bg-white rounded-2xl shadow-xl border overflow-hidden">
         <div className="flex items-center gap-3 py-3 sm:px-5 border-b">
           <div className="p-2 border rounded-lg">
-            <Map className="w-5 h-5" />
+            <Image src={Birdeye} alt="Marketing Map" className="w-5 h-5" />
           </div>
           <h2 className="text-lg font-medium">Marketing Map</h2>
           <button
