@@ -1,13 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { Globe, Menu, Search, Upload, Trash2 } from "lucide-react";
+import { Globe, Menu, Search, Upload, Trash2, Loader2 } from "lucide-react";
 import Image from "next/image";
 import logo from "../public/images/promenade logo.svg";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface searchHistory {
@@ -16,6 +18,7 @@ interface searchHistory {
 }
 
 export function AppSidebar() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = React.useState(false);
   const [searchHistory, setSearchHistory] = React.useState<searchHistory[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -29,6 +32,10 @@ export function AppSidebar() {
   const fetchSearchHistory = async () => {
     try {
       setLoading(true);
+
+      if (searchHistory.length > 0) {
+        setLoading(false);
+      }
 
       const response = await (
         await fetch(
@@ -71,6 +78,11 @@ export function AppSidebar() {
       }
 
       setSearchHistory((prev) => prev.filter((item) => item.id !== id));
+
+      // Redirect to home if deleting the current query
+      if (pathname === `/search/${id}`) {
+        router.push("/");
+      }
     } catch (error) {
       console.error("Error deleting search history:", error);
     } finally {
@@ -157,18 +169,29 @@ export function AppSidebar() {
               <Link
                 href={`/search/${id}`}
                 key={index}
-                className="group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-[#1C1C1C] rounded-lg transition-colors relative"
+                className={cn(
+                  "group w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-300 hover:bg-[#1C1C1C] rounded-lg transition-colors relative",
+                  pathname === `/search/${id}` && "bg-[#2C2C2C]"
+                )}
               >
                 <Globe className="w-4" />
                 <span className="flex-1 text-left truncate">{query}</span>
                 <button
                   onClick={(e) => handleDelete(id, e)}
-                  className={`opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-red-500 ${
-                    deletingId === id ? "animate-spin pointer-events-none" : ""
-                  }`}
+                  className={cn(
+                    "opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:text-red-500",
+                    deletingId === id && "opacity-100"
+                  )}
                   disabled={deletingId === id}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  {deletingId === id ? (
+                    <div className="relative w-4 h-4">
+                      <Loader2 className="w-4 h-4 animate-spin absolute" />
+                      <div className="w-4 h-4 border-2 border-red-500 rounded-full absolute animate-ping"></div>
+                    </div>
+                  ) : (
+                    <Trash2 className="w-4 h-4" />
+                  )}
                 </button>
               </Link>
             ))

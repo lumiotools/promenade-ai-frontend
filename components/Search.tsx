@@ -14,8 +14,8 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import ValueChain from "../public/icons/value-chain.png";
-import Birdeye from "../public/icons/birdeye.png";
+import ValueChain from "../public/icons/Value Chain Icon.svg"
+import Birdeye from "../public/icons/Segment Breakdown Icon.svg"
 import { CompanyProfileModal } from "../components/CompanyProfileModal";
 import { MarketingTrendsModal } from "../components/MarketingTrendsModal";
 import { ValueChainModal } from "../components/ValueChainModal";
@@ -250,7 +250,7 @@ export default function SearchPage({
                   }}
                 >
                   <Eye className="w-3 h-4 object-contain"></Eye>
-                  See Preview
+                  Preview
                 </button>
               </div>
               <h3 className="font-semibold mb-2 text-[14px]">
@@ -280,7 +280,7 @@ export default function SearchPage({
                   }}
                 >
                   <Eye className="w-3 h-4 object-contain"></Eye>
-                  See Preview
+                  Preview
                 </button>
               </div>
               <h3 className="font-semibold mb-2 text-[14px]">
@@ -314,7 +314,7 @@ export default function SearchPage({
                   }}
                 >
                   <Eye className="w-3 h-4 object-contain"></Eye>
-                  See Preview
+                  Preview
                 </button>
               </div>
               <h3 className="font-semibold mb-2 text-[14px]">Value Chain</h3>
@@ -346,7 +346,7 @@ export default function SearchPage({
                   }}
                 >
                   <Eye className="w-3 h-4 object-contain"></Eye>
-                  See Preview
+                  Preview
                 </button>
               </div>
               <h3 className="font-semibold mb-2 text-[14px]">Marketing Map</h3>
@@ -378,7 +378,7 @@ export default function SearchPage({
                   }}
                 >
                   <Eye className="w-3 h-4 object-contain"></Eye>
-                  See Preview
+                  Preview
                 </button>
               </div>
               <h3 className="font-semibold mb-2 text-[14px]">
@@ -413,7 +413,7 @@ export default function SearchPage({
                   }}
                 >
                   <Eye className="w-3 h-4 object-contain"></Eye>
-                  See Preview
+                  Preview
                 </button>
               </div>
               <h3 className="font-semibold mb-2 text-[14px]">
