@@ -414,7 +414,7 @@ export default function SearchResultsPage({
     return (
       <Tabs
         defaultValue="all"
-        className="w-full flex flex-col items-start mb-10 md:mt-5"
+        className="w-full flex flex-col items-start mb-10 md:mt-1"
       >
         <div className="my-1 mt-5">
           <TabsList className="flex flex-wrap gap-2 md:gap-4 w-full bg-transparent items-start">
@@ -459,7 +459,11 @@ export default function SearchResultsPage({
           { value: "press", filter: "Press" },
           { value: "uploadedDocument", filter: "Uploaded Document" },
         ].map((tab) => (
-          <TabsContent key={tab.value} value={tab.value} className="mt-28 md:mt-0">
+          <TabsContent
+            key={tab.value}
+            value={tab.value}
+            className="mt-28 md:mt-0"
+          >
             {renderFilteredResults(tab.filter)}
           </TabsContent>
         ))}
@@ -544,10 +548,7 @@ export default function SearchResultsPage({
 
           {showAiSummary ? renderAiSummary() : <></>}
 
-          <div className="border border-gray-100 w-full"></div>
-          {renderContentTabs()}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 mt-5 pt-7 md:pt-0">
             {searchResults.validSources.length > 0 &&
               renderSourceList(
                 searchResults.validSources,
@@ -561,6 +562,9 @@ export default function SearchResultsPage({
                 "invalid"
               )}
           </div>
+
+          <div className="border border-gray-100 w-full"></div>
+          {renderContentTabs()}
         </>
       ) : (
         <></>
