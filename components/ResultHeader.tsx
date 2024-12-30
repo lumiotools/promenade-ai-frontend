@@ -84,7 +84,7 @@ export function ResultHeader({
               onClick={onShare}
             >
               <Image
-                src="/icons/share.svg"
+                src="/icons/Share.svg"
                 alt="Share"
                 width={20}
                 height={20}

@@ -81,7 +81,7 @@ export function CompanyHeader({ companyData }: CompanyHeaderProps) {
                 className="gap-2 bg-[#7C3AED] hover:bg-[#6D28D9] w-full md:w-auto"
               >
                 <Image
-                  src="/icons/share.svg"
+                  src="/icons/Share.svg"
                   alt="share"
                   width={20}
                   height={20}
