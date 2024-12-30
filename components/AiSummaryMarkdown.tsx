@@ -11,7 +11,7 @@ export function AiSummaryMarkdown({ summary }: { summary: string }) {
 
   if (!isExpanded) {
     return (
-      <div className="relative w-full mb-8">
+      <div className="relative w-full mb-8 mt-4">
         <button
           onClick={() => setIsExpanded(true)}
           className="absolute left-1/2 -translate-x-1/2 -translate-y-1 md:-translate-y-8 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-white border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
