@@ -15,6 +15,7 @@ import rehypeRaw from "rehype-raw";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "../../ui/use-toast";
 import calender from "../../../public/icons/calendar-icon.svg";
+import ServicesCards from "@/components/ServicesCards";
 
 export interface Node {
   content: string;
@@ -565,6 +566,11 @@ export default function SearchResultsPage({
 
           <div className="border border-gray-100 w-full"></div>
           {renderContentTabs()}
+
+          <>
+            <ServicesCards></ServicesCards>
+          </>
+
         </>
       ) : (
         <></>
